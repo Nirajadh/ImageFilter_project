@@ -3,12 +3,10 @@
 #include <stdint.h>
 #include <dirent.h>
 #include <string.h>
-#pragma pack(push, 1)
-
 
 char infile[30];
 
-
+#pragma pack(push, 1)
 typedef struct
 {
     uint16_t type;
@@ -36,35 +34,32 @@ typedef struct
 } pixel;          // yo chai pixel ho
 #pragma pack(pop) // pop le chai default setting ma laijancha
 
-
-
 //{FUNCTION Declaretion
 void listf(char *path);
 int searchimg(char *openpath);
 int dirdis();
 void grayscale(int height, int width, pixel image[height][width]);
 
-
 //
 int main()
 {
     dirdis();
     FILE *inputf = fopen(infile, "rb");
-   
-     if (inputf == NULL)
+
+    if (inputf == NULL)
     {
         fclose(inputf);
         printf("\nCould not open input img");
         return 0;
     }
     FILE *outf = fopen("out.bmp", "wb");
-     if (inputf == NULL)
+    if (inputf == NULL)
     {
         fclose(inputf);
         printf("\nCould not open output img");
         return 0;
     }
- 
+
     BMPHeader header;
 
     fread(&header, sizeof(BMPHeader), 1, inputf);
@@ -90,7 +85,7 @@ int main()
     }
 
     // grayscale apply
-   grayscale(height, width, image);
+    grayscale(height, width, image);
 
     // write data to output file
     for (int i = 0; i < height; i++)
@@ -105,11 +100,8 @@ int main()
     free(image);
     fclose(inputf);
     fclose(outf);
-
 }
 //
-
-
 
 // functions
 
@@ -164,12 +156,9 @@ int dirdis()
             }
         }
     }
-    strcpy(infile,openpath);
-return 0;
-    
+    strcpy(infile, openpath);
+    return 0;
 }
-
-
 
 int searchimg(char *openpath)
 {
@@ -193,8 +182,6 @@ int searchimg(char *openpath)
     }
 }
 
-
-
 void listf(char *path)
 {
     DIR *d;
@@ -215,8 +202,7 @@ void listf(char *path)
     }
 }
 
-
-
+//filter functions
 void grayscale(int height, int width, pixel image[height][width])
 {
     for (int i = 0; i < height; i++)
