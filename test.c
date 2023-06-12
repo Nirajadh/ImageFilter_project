@@ -4,12 +4,7 @@
 #include<conio.h>
 int main(){
     char a[19] ,b[20] , c[20];
-    //scanf("%[^\n]", &a);
-    //printf("%s\n",a);
-    gets(c);
-        printf("%s\n", c);
-        //scanf("%s", &b);
-          //printf("%s\n", b);
+     a[strcspn(a, "\n")] = '\0';
           
     return 0;
 }

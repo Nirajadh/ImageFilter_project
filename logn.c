@@ -147,8 +147,8 @@ int newuser()
 }
 int userslog()
 {
-    int c = 9, d = 11, f = 10;
-    Information in;
+    int c = 9, d = 11, f = 10 , choose_option=0;
+    Information in[5];
     system("cls");
     rect(20, 102, 4, 25);
     rect(44, 78, 7, 23);
@@ -156,18 +156,54 @@ int userslog()
     printf("USERS");
 
     info = fopen("authentication.txt", "r");
-    int i = 1;
-    while (fread(&in, sizeof(Information), 1, info))
+    int i = 0;
+    while (fread(&in[i], sizeof(Information), 1, info))
     {
         rect(49, 72, c, d);
         gotoxy(51, f);
-        printf("%d. %s", i, in.username);
+        printf("%d. %s", i+1, in[i].username);
         c = c + 3;
         d = d + 3;
         f = f + 3;
         i++;
     }
-    getch();
+
+        gotoxy(50, 23);
+    printf("    Choose Option");
+    scanf("%d", &choose_option);
+
+    switch (choose_option)
+    {
+    case 1:
+       system("cls");
+rect(20, 102, 4, 25);
+    rect(44, 78, 7, 23);
+  rect(49, 72, 9, 11);
+  gotoxy(54, 10);
+  printf("%s",in[0].username);
+        break;
+    case 2:
+        system("cls");
+     rect(20, 102, 4, 25);
+    rect(44, 78, 7, 23);
+rect(49, 72, 9, 11);
+  gotoxy(54, 10);
+  printf("%s",in[1].username);
+        break;
+    case 3:
+        system("cls");
+rect(20, 102, 4, 25);
+    rect(44, 78, 7, 23);
+rect(49, 72, 9, 11);
+  gotoxy(54, 10);
+  printf("%s",in[2].username);
+        break;
+    default:
+        printf("wrong input");
+        system("cls");
+        userslog();
+        break;
+    }
     return 0;
 }
 
