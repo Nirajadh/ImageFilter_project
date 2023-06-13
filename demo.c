@@ -61,7 +61,7 @@ int main()
         printf("Could not open img");
         return 0;
     }
-    FILE *outf = fopen("out.bmp", "wb");
+    FILE *outf = fopen("C:\\Users\\Niraj adh\\Pictures\\image filter\\out.bmp", "wb");
     if (outf == NULL)
     {
         fclose(inputf);
