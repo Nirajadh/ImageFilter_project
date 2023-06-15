@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <windows.h>
 FILE *info;
+FILE *userfile;
 typedef struct Info
 {
     char username[30];
@@ -13,9 +14,11 @@ typedef struct Info
 void saveNUsers();
 void loadNUsers();
 int userslog();
+int login(Information x);
 int guest();
 int newuser();
 int exitprg();
+
 void rect(int xa, int xb, int ya, int yb);
 void gotoxy(int x, int y);
 int first();
@@ -86,7 +89,7 @@ int first()
         gotoxy(50, 17);
         printf(" \t Exit");
 
-        gotoxy(50, 20);
+        gotoxy(49, 20);
         printf("    Choose Option");
         scanf("%d", &choose_option);
     }
@@ -196,6 +199,7 @@ int userslog()
     int c = 9, d = 11, f = 10, choose_option = 0;
     Information in[5];
     system("cls");
+     
     rect(20, 102, 4, 25);
     rect(44, 78, 7, 23);
     gotoxy(58, 5);
@@ -213,47 +217,43 @@ int userslog()
         f = f + 3;
         i++;
     }
-
-    gotoxy(50, 22);
-    printf("    Choose Option");
+    xxx:
+ fflush(stdin);
+    gotoxy(54, 22);
+    printf("Choose Option");
+     gotoxy(68, 22);
     scanf("%d", &choose_option);
 
     switch (choose_option)
     {
     case 1:
-        system("cls");
-        rect(20, 102, 4, 25);
-        rect(44, 78, 7, 23);
-        rect(49, 72, 9, 11);
-        gotoxy(54, 10);
-        printf("%s", in[0].username);
+        login(in[0]);
         break;
     case 2:
-        system("cls");
-        rect(20, 102, 4, 25);
-        rect(44, 78, 7, 23);
-        rect(49, 72, 9, 11);
-        gotoxy(54, 10);
-        printf("%s", in[1].username);
+        login(in[1]);
         break;
     case 3:
-        system("cls");
-        rect(20, 102, 4, 25);
-        rect(44, 78, 7, 23);
-        rect(49, 72, 9, 11);
-        gotoxy(54, 10);
-        printf("%s", in[2].username);
+        login(in[2]);
+        break;
+    case 4:
+        login(in[3]);
         break;
     default:
+    gotoxy(55, 24);
         printf("wrong input");
-        system("cls");
-        userslog();
+        gotoxy(68, 22);
+         printf("     ");
+        goto xxx;
         break;
     }
     return 0;
 }
 int guest()
 {
+    system("cls");
+    rect(38, 90, 4, 21);
+    gotoxy(50, 17);
+    printf(" Logged in as Guest !!");
     return 0;
 }
 int exitprg()
@@ -270,6 +270,7 @@ void saveNUsers()
     }
 }
 void loadNUsers()
+
 {
     FILE *file = fopen("nusers.txt", "r");
     if (file != NULL)
@@ -277,4 +278,49 @@ void loadNUsers()
         fscanf(file, "%d", &nusers);
         fclose(file);
     }
+}
+int login(Information x)
+{
+    char pass[30];
+    system("cls");
+    rect(20, 102, 4, 25);
+    gotoxy(58, 6);
+    printf("LOGIN");
+    rect(44, 78, 7, 20);
+    rect(49, 72, 9, 11);
+    gotoxy(54, 10);
+    printf("%s", x.username);
+    rect(49, 72, 12, 14);
+    gotoxy(53, 13);
+    printf("Enter Password");
+    getch();
+ xxx:
+    fflush(stdin);
+    /////////////////////////
+    gotoxy(53, 13);
+    printf("              ");
+    gotoxy(53, 13);
+   
+    scanf("%[^\n]", pass);
+
+    if (strcmp(pass, x.password) == 0)
+    {
+        gotoxy(50, 15);
+        printf("Logged in succesfully");
+        userfile = fopen(strcat(x.username, ".txt"), "ab");
+        fclose(userfile);
+        fflush(stdin);
+        getch();
+    }
+    else
+    {
+        gotoxy(51, 15);
+        printf("Incorrect Password");
+      getch();
+       gotoxy(51, 15);
+        printf("                  ");
+        goto xxx;
+    }
+
+    return 0;
 }
