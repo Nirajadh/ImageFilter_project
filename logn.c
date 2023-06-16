@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <windows.h>
 FILE *info;
+int userno;
 FILE *userfile;
 typedef struct Info
 {
@@ -18,7 +19,9 @@ int login(Information x);
 int guest();
 int newuser();
 int exitprg();
-
+void delete(Information x);
+void change_pass();
+int options(Information x);
 void rect(int xa, int xb, int ya, int yb);
 void gotoxy(int x, int y);
 int first();
@@ -197,9 +200,9 @@ int newuser()
 int userslog()
 {
     int c = 9, d = 11, f = 10, choose_option = 0;
-    Information in[5];
+    Information in[4];
     system("cls");
-     
+
     rect(20, 102, 4, 25);
     rect(44, 78, 7, 23);
     gotoxy(58, 5);
@@ -217,32 +220,40 @@ int userslog()
         f = f + 3;
         i++;
     }
-    xxx:
- fflush(stdin);
+xxx:
+    fflush(stdin);
     gotoxy(54, 22);
     printf("Choose Option");
-     gotoxy(68, 22);
+    gotoxy(68, 22);
     scanf("%d", &choose_option);
 
     switch (choose_option)
     {
     case 1:
-        login(in[0]);
+     userno = 0;
+        options(in[0]);
+       
         break;
     case 2:
-        login(in[1]);
+     userno = 1;
+        options(in[1]);
+       
         break;
     case 3:
-        login(in[2]);
+      userno = 2;
+        options(in[2]);
+      
         break;
     case 4:
-        login(in[3]);
+     userno = 3;
+        options(in[3]);
+       
         break;
     default:
-    gotoxy(55, 24);
+        gotoxy(55, 24);
         printf("wrong input");
         gotoxy(68, 22);
-         printf("     ");
+        printf("     ");
         goto xxx;
         break;
     }
@@ -294,13 +305,13 @@ int login(Information x)
     gotoxy(53, 13);
     printf("Enter Password");
     getch();
- xxx:
+xxx:
     fflush(stdin);
     /////////////////////////
     gotoxy(53, 13);
     printf("              ");
     gotoxy(53, 13);
-   
+
     scanf("%[^\n]", pass);
 
     if (strcmp(pass, x.password) == 0)
@@ -316,11 +327,100 @@ int login(Information x)
     {
         gotoxy(51, 15);
         printf("Incorrect Password");
-      getch();
-       gotoxy(51, 15);
+        getch();
+        gotoxy(51, 15);
         printf("                  ");
         goto xxx;
     }
 
     return 0;
+}
+int options(Information x)
+{
+    int choose_option;
+    system("cls");
+    gotoxy(41, 7);
+    printf("%s", x.username);
+    rect(40, 90, 6, 18);
+    rect(48, 55, 10, 13);
+    gotoxy(49, 11);
+    printf("Login");
+    rect(61, 69, 10, 13);
+    gotoxy(62, 11);
+    printf("Change");
+    gotoxy(61, 12);
+    printf("Password");
+    rect(75, 83, 10, 13);
+    gotoxy(76, 11);
+    printf("Delete");
+xxx:
+    fflush(stdin);
+    gotoxy(57, 16);
+    printf("Choose Option");
+    gotoxy(71, 16);
+    scanf("%d", &choose_option);
+
+    switch (choose_option)
+    {
+    case 1:
+        login(x);
+        break;
+    case 2:
+        change_pass(x);
+        break;
+    case 3:
+        delete (x);
+        break;
+    default:
+        gotoxy(71, 16);
+        printf("     ");
+        goto xxx;
+        break;
+    }
+    return 0;
+}
+void delete(Information x)
+{
+}
+void change_pass()
+{
+    Information in[4];
+    printf("%d", userno);
+    getch();
+    info = fopen("authentication.txt", "rb");
+    for (int i = 0; i < 4; i++)
+    {
+      fread(&in[i], sizeof(Information), 1, info);  
+    }
+  fclose(info);
+  printf("%s",in[userno].password);
+   login(in[userno]);
+    char pass[30];
+
+    system("cls");
+    rect(44, 78, 7, 20);
+    rect(49, 72, 9, 11);
+    gotoxy(54, 10);
+    printf("%s", in[userno].username);
+    rect(49, 72, 12, 14);
+    gotoxy(53, 13);
+    printf("New Password");
+    getch();
+    fflush(stdin);
+    /////////////////////////
+    gotoxy(53, 13);
+    printf("              ");
+    gotoxy(53, 13);
+
+    scanf(" %[^\n]", pass);
+    strcpy(in[userno].password, pass);
+    info = fopen("authentication.txt", "wb");
+for (int  i = 0; i < 4; i++)
+{
+ fwrite(&in[i], sizeof(Information), 1, info);
+}
+
+   
+    fclose(info);
+
 }
