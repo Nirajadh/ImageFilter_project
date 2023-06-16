@@ -19,7 +19,7 @@ int login(Information x);
 int guest();
 int newuser();
 int exitprg();
-void delete(Information x);
+void delete();
 void change_pass();
 int options(Information x);
 void rect(int xa, int xb, int ya, int yb);
@@ -29,12 +29,14 @@ int first();
 int nusers;
 int main()
 {
+    system("color 07");
     loadNUsers();
     first();
     return 0;
 }
 void rect(int xa, int xb, int ya, int yb)
 {
+    printf("\033[1m");
     int i = 0;
     for (i = xa; i < xb; i++)
     {
@@ -62,6 +64,7 @@ void rect(int xa, int xb, int ya, int yb)
         gotoxy(xb, i);
         printf("%c", 179);
     }
+    printf("\033[0m");
 }
 void gotoxy(int x, int y)
 {
@@ -78,8 +81,12 @@ int first()
     rect(20, 102, 4, 25); // border
     fflush(stdin);
     int choose_option = 0;
+    printf("\033[1m");
     gotoxy(54, 6);
+    printf("\033[1m"); // bold
+    printf("\033[4m"); // underline
     printf("IMAGE FILTER");
+    printf("\033[0m");
     rect(49, 70, 10, 12);
     gotoxy(50, 11);
     printf("1.  SELECT USER");
@@ -230,24 +237,24 @@ xxx:
     switch (choose_option)
     {
     case 1:
-     userno = 0;
+        userno = 0;
         options(in[0]);
-       
+
         break;
     case 2:
-     userno = 1;
+        userno = 1;
         options(in[1]);
-       
+
         break;
     case 3:
-      userno = 2;
+        userno = 2;
         options(in[2]);
-      
+
         break;
     case 4:
-     userno = 3;
+        userno = 3;
         options(in[3]);
-       
+
         break;
     default:
         gotoxy(55, 24);
@@ -379,8 +386,79 @@ xxx:
     }
     return 0;
 }
-void delete(Information x)
+void delete()
 {
+    Information in[4];
+    system("cls");
+    rect(40, 80, 12, 19);
+    gotoxy(45, 14);
+    printf("Are you sure you want to delete");
+    gotoxy(55, 15);
+    printf("this user?");
+    rect(42, 47, 16, 18);
+    rect(74, 78, 16, 18);
+    gotoxy(43, 17);
+    printf("Yes");
+    gotoxy(75, 17);
+    printf("No");
+    int choose_option;
+xxx:
+    fflush(stdin);
+    gotoxy(50, 20);
+    printf("Choose Option");
+    gotoxy(64, 20);
+    scanf("%d", &choose_option);
+
+    switch (choose_option)
+    {
+    case 1:
+
+        info = fopen("authentication.txt", "rb");
+        for (int i = 0; i < nusers; i++)
+        {
+            fread(&in[i], sizeof(Information), 1, info);
+        }
+
+        for (int i = userno; i < nusers; i++)
+        {
+            if (i == nusers - 1)
+            {
+                strcpy(in[nusers - 1].password, "");
+                strcpy(in[nusers - 1].username, "");
+            }
+            else
+            {
+                strcpy(in[i].password, in[i + 1].password);
+                strcpy(in[i].username, in[i + 1].username);
+            }
+        }
+
+        fclose(info);
+        nusers--;
+        saveNUsers(nusers);
+        info = fopen("authentication.txt", "wb");
+        for (int i = 0; i < nusers; i++)
+        {
+            fwrite(&in[i], sizeof(Information), 1, info);
+        }
+
+        fclose(info);
+          system("cls");
+          gotoxy(55, 15);
+          printf("User Deleted..");
+          getch();
+userslog();
+        break;
+    case 2:
+        options(in[userno]);
+
+        break;
+    default:
+        gotoxy(64, 20);
+        printf("     ");
+        goto xxx;
+        break;
+    }
 }
 void change_pass()
 {
@@ -388,13 +466,13 @@ void change_pass()
     printf("%d", userno);
     getch();
     info = fopen("authentication.txt", "rb");
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < nusers; i++)
     {
-      fread(&in[i], sizeof(Information), 1, info);  
+        fread(&in[i], sizeof(Information), 1, info);
     }
-  fclose(info);
-  printf("%s",in[userno].password);
-   login(in[userno]);
+    fclose(info);
+    printf("%s", in[userno].password);
+    login(in[userno]);
     char pass[30];
 
     system("cls");
@@ -415,12 +493,10 @@ void change_pass()
     scanf(" %[^\n]", pass);
     strcpy(in[userno].password, pass);
     info = fopen("authentication.txt", "wb");
-for (int  i = 0; i < 4; i++)
-{
- fwrite(&in[i], sizeof(Information), 1, info);
-}
+    for (int i = 0; i < nusers; i++)
+    {
+        fwrite(&in[i], sizeof(Information), 1, info);
+    }
 
-   
     fclose(info);
-
 }
