@@ -44,6 +44,8 @@ int Filter();
 FILE *info;
 int userno;
 int nusers;
+int i=10,x=31;
+int count=1;
 char username[30];
 FILE *userfile;
 typedef struct Info
@@ -400,7 +402,7 @@ xxx:
         fflush(stdin);
         if (cp == 0)
         {
-            Filter();
+           home();
         }
     }
     else
@@ -408,6 +410,7 @@ xxx:
         gotoxy(51, 15);
         printf("Incorrect Password");
         sleep(2);
+        fflush(stdin);
         gotoxy(51, 15);
         printf("                  ");
         goto xxx;
@@ -578,14 +581,11 @@ void change_pass()
     fclose(info);
 }
 
-void select_img()
-{
-}
-void select_filter()
-{
+void select_filter(){
 }
 void home()
 {
+    int choose_option;
     system("cls");
     rect(20, 102, 4, 25); // border
     printf("\033[1m");
@@ -594,25 +594,54 @@ void home()
     printf("%s", username);
     printf("\033[0m");
 
-    rect(28, 42, 11, 15);
-    gotoxy(29, 13);
+    rect(27, 41, 11, 17);
+    gotoxy(29, 14);
     printf("ADD FILTER");
-    rect(46, 60, 11, 15);
-    gotoxy(47, 13);
+
+    rect(45, 59, 11, 17);
+    gotoxy(46, 14);
     printf("DELETE IMAGE");
-     gotoxy(65, 13);
+
+    rect(63, 77, 11, 17);
+    gotoxy(66, 14);
     printf("HISTORY");
-    rect(64, 76, 11, 15);
-    gotoxy(81, 13);
+
+    rect(81, 95, 11, 17);
+    gotoxy(85, 14);
     printf("LOGOUT");
-    rect(80, 94, 11, 15);
-getch();
+   
+xxx:
+ fflush(stdin);
+    gotoxy(57, 19);
+    printf("Choose Option");
+    gotoxy(71, 19);
+    scanf("%d", &choose_option);
+
+    switch (choose_option)
+    {
+    case 1:
+          dirdis();
+Filter();
+        break;
+    case 2:
+         dirdis();
+        break;
+    case 3:
+       
+        break;
+    case 0:
+     
+        break;
+    default:
+        gotoxy(71, 16);
+        printf("     ");
+        goto xxx;
+        break;
+    }
 }
 
 int Filter()
 {
- home();
-    dirdis();
     FILE *inputf = fopen(infile, "rb");
     if (inputf == NULL)
     {
@@ -678,15 +707,23 @@ int dirdis()
     char *picpath = {"C:\\Users\\Niraj adh\\Pictures"};
     char *downpath = {"C:\\Users\\Niraj adh\\Downloads"};
     char openpath[200];
-
-    printf("Select Images");
+    system("cls");
+    rect(20, 102, 4, 25);
+    rect(30, 92, 7, 22);
+    printf("\033[1m");
+    printf("\033[4m");
+    gotoxy(58, 5);
+    printf("Images");
+    printf("\033[0m");
+       fflush(stdin);
     listf(deskpath);
     listf(picpath);
     listf(downpath);
 
     char image[100];
-
-    printf("SEARCH IMAGE : ");
+gotoxy(43,20);
+    printf("SEARCH IMAGE :");
+    gotoxy(58,20);
     fgets(image, sizeof(image), stdin);
     image[strcspn(image, "\n")] = '\0';
 
@@ -742,6 +779,7 @@ int searchimg(char *openpath)
 
 void listf(char *path)
 {
+   
     DIR *d;
     struct dirent *dir;
     d = opendir(path);
@@ -752,7 +790,17 @@ void listf(char *path)
             char *ext = strrchr(dir->d_name, '.');
             if (ext != NULL && strcmp(ext, ".bmp") == 0)
             {
-                printf("%s\n", dir->d_name);
+                if (i>=18)
+                {
+                   i=10;
+                   x=50; 
+                }
+                
+                    gotoxy(x, i);
+                printf("%d.%s\n",count, dir->d_name);
+                i=i+2;
+                count++;
+               
             }
         }
         closedir(d);
