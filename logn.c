@@ -157,7 +157,7 @@ void first()
         break;
     default:
         printf("wrong input");
-        sleep(1);
+        sleep(2);
         system("cls");
         first();
         break;
@@ -186,7 +186,7 @@ void newuser()
     if (info == NULL)
     {
         printf("Unable to open file ");
-        sleep(1);
+        sleep(2);
     }
     else
     {
@@ -194,7 +194,7 @@ void newuser()
         fwrite(&i, sizeof(Information), 1, info); // writing into file in binary mode
         gotoxy(50, 17);
         printf(" Signed Up Sucessfully !!");
-        Sleep(1);
+        Sleep(2);
         nusers++;
         saveNUsers();
         fclose(info);
@@ -298,7 +298,7 @@ void guest()
     rect(38, 90, 4, 21);
     gotoxy(50, 17);
     printf(" Logged in as Guest !!");
-    sleep(1);
+    sleep(2);
 }
 void exitprg()
 {
@@ -351,7 +351,7 @@ xxx:
     {
         gotoxy(50, 15);
         printf("Logged in succesfully");
-        sleep(1);
+        sleep(2);
         userfile = fopen(strcat(x.username, ".txt"), "ab");
         fclose(userfile);
         fflush(stdin);
@@ -360,7 +360,7 @@ xxx:
     {
         gotoxy(51, 15);
         printf("Incorrect Password");
-        sleep(1);
+        sleep(2);
         gotoxy(51, 15);
         printf("                  ");
         goto xxx;
@@ -475,7 +475,7 @@ xxx:
         system("cls");
         gotoxy(55, 15);
         printf("User Deleted..");
-        sleep(1);
+        sleep(2);
         userslog();
         break;
     case 2:

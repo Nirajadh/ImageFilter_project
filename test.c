@@ -4,8 +4,47 @@
 #include <string.h>
 #include <unistd.h>
 #include <windows.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <dirent.h>
+char infile[30];
+#pragma pack(push, 1)
+typedef struct
+{
+    uint16_t type;
+    uint32_t size;
+    uint16_t reserved1;
+    uint16_t reserved2;
+    uint32_t offset; // uint vaneko unsingned int ho (positive value matra huncha)
+    uint32_t dib_header_size;
+    int32_t width_px;
+    int32_t height_px;
+    uint16_t num_planes;
+    uint16_t bits_per_pixel;
+    uint32_t compression;
+    uint32_t image_size_bytes;
+    int32_t x_resolution_ppm;
+    int32_t y_resolution_ppm;
+    uint32_t num_colors;
+    uint32_t important_colors;
+} BMPHeader;
+typedef struct
+{
+    uint8_t rgbtBlue;
+    uint8_t rgbtGreen;
+    uint8_t rgbtRed;
+} pixel;
+#pragma pack(pop)
+void listf(char *path);
+int searchimg(char *openpath);
+int dirdis();
+void grayscale(int height, int width, pixel image[height][width]);
+int Filter();
+
 FILE *info;
 int userno;
+int nusers;
+char username[30];
 FILE *userfile;
 typedef struct Info
 {
@@ -14,19 +53,21 @@ typedef struct Info
 } Information;
 void saveNUsers();
 void loadNUsers();
-int userslog();
-int login(Information x); 
-int guest();
-int newuser();
-int exitprg();
-void delete(Information x);
+void userslog();
+void login(Information x, int cp);
+void guest();
+void newuser();
+void exitprg();
+void delete();
 void change_pass();
-int options(Information x);
+void options(Information x);
 void rect(int xa, int xb, int ya, int yb);
 void gotoxy(int x, int y);
-int first();
+void first();
+void select_img();
+void select_filter();
+void home();
 
-int nusers;
 int main()
 {
     system("color 07");
@@ -34,6 +75,7 @@ int main()
     first();
     return 0;
 }
+
 void rect(int xa, int xb, int ya, int yb)
 {
     printf("\033[1m");
@@ -73,18 +115,16 @@ void gotoxy(int x, int y)
     coord.Y = y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
-
-int first()
+void first()
 {
-
     system("cls");
     rect(20, 102, 4, 25); // border
     fflush(stdin);
     int choose_option = 0;
-     printf("\033[1m");  
+    printf("\033[1m");
     gotoxy(54, 6);
-    printf("\033[1m"); //bold
-    printf("\033[4m"); //underline
+    printf("\033[1m"); // bold
+    printf("\033[4m"); // underline
     printf("IMAGE FILTER");
     printf("\033[0m");
     rect(49, 70, 10, 12);
@@ -158,14 +198,13 @@ int first()
         break;
     default:
         printf("wrong input");
+        sleep(2);
         system("cls");
         first();
         break;
     }
-    return 0;
 }
-
-int newuser()
+void newuser()
 {
     system("cls");
     rect(38, 90, 4, 21);
@@ -188,6 +227,7 @@ int newuser()
     if (info == NULL)
     {
         printf("Unable to open file ");
+        sleep(2);
     }
     else
     {
@@ -195,16 +235,14 @@ int newuser()
         fwrite(&i, sizeof(Information), 1, info); // writing into file in binary mode
         gotoxy(50, 17);
         printf(" Signed Up Sucessfully !!");
+        Sleep(2);
         nusers++;
         saveNUsers();
-        getch();
         fclose(info);
     }
     first();
-
-    return 0;
 }
-int userslog()
+void userslog()
 {
     int c = 9, d = 11, f = 10, choose_option = 0;
     Information in[4];
@@ -215,18 +253,22 @@ int userslog()
     gotoxy(58, 5);
     printf("USERS");
 
+    rect(21, 23, 5, 7);
+    gotoxy(22, 6);
+    printf("%c", 174);
     info = fopen("authentication.txt", "r");
-    int i = 0;
-    while (fread(&in[i], sizeof(Information), 1, info))
+
+    for (int i = 0; i < nusers; i++)
     {
+        fread(&in[i], sizeof(Information), 1, info);
         rect(49, 72, c, d);
         gotoxy(51, f);
         printf("%d. %s", i + 1, in[i].username);
         c = c + 3;
         d = d + 3;
         f = f + 3;
-        i++;
     }
+    fclose(info);
 xxx:
     fflush(stdin);
     gotoxy(54, 22);
@@ -236,47 +278,73 @@ xxx:
 
     switch (choose_option)
     {
+
     case 1:
-     userno = 0;
-        options(in[0]);
-       
-        break;
+        if (nusers >= 1)
+        {
+            userno = 0;
+            options(in[0]);
+            break;
+        }
+
+        goto xxy;
     case 2:
-     userno = 1;
-        options(in[1]);
-       
-        break;
+        if (nusers >= 2)
+        {
+            userno = 1;
+            options(in[1]);
+            break;
+        }
+
+        goto xxy;
     case 3:
-      userno = 2;
-        options(in[2]);
-      
-        break;
+        if (nusers >= 3)
+        {
+            userno = 2;
+            options(in[2]);
+            break;
+        }
+        goto xxy;
+
     case 4:
-     userno = 3;
-        options(in[3]);
-       
+        if (nusers == 4)
+        {
+            userno = 3;
+            options(in[3]);
+            break;
+        }
+
+        goto xxy;
+
+    case 0:
+        first();
+
         break;
     default:
+    xxy:
         gotoxy(55, 24);
         printf("wrong input");
+        Sleep(2);
+        gotoxy(55, 24);
+        printf("            ");
         gotoxy(68, 22);
         printf("     ");
         goto xxx;
         break;
     }
-    return 0;
+    first();
 }
-int guest()
+void guest()
 {
     system("cls");
     rect(38, 90, 4, 21);
     gotoxy(50, 17);
     printf(" Logged in as Guest !!");
-    return 0;
+    sleep(2);
 }
-int exitprg()
+void exitprg()
 {
-    return 0;
+    exit(0);
 }
 void saveNUsers()
 {
@@ -297,7 +365,7 @@ void loadNUsers()
         fclose(file);
     }
 }
-int login(Information x)
+void login(Information x, int cp)
 {
     char pass[30];
     system("cls");
@@ -325,31 +393,38 @@ xxx:
     {
         gotoxy(50, 15);
         printf("Logged in succesfully");
+        sleep(2);
+
         userfile = fopen(strcat(x.username, ".txt"), "ab");
         fclose(userfile);
         fflush(stdin);
-        getch();
+        if (cp == 0)
+        {
+            Filter();
+        }
     }
     else
     {
         gotoxy(51, 15);
         printf("Incorrect Password");
-        getch();
+        sleep(2);
         gotoxy(51, 15);
         printf("                  ");
         goto xxx;
     }
-
-    return 0;
 }
-int options(Information x)
+void options(Information x)
 {
+    strcpy(username, x.username);
     int choose_option;
     system("cls");
-    gotoxy(41, 7);
+    gotoxy(45, 7);
     printf("%s", x.username);
     rect(40, 90, 6, 18);
     rect(48, 55, 10, 13);
+
+    gotoxy(41, 7);
+    printf("%c", 174);
     gotoxy(49, 11);
     printf("Login");
     rect(61, 69, 10, 13);
@@ -370,7 +445,7 @@ xxx:
     switch (choose_option)
     {
     case 1:
-        login(x);
+        login(x, 0);
         break;
     case 2:
         change_pass(x);
@@ -378,31 +453,34 @@ xxx:
     case 3:
         delete (x);
         break;
+    case 0:
+        userslog();
+        break;
     default:
         gotoxy(71, 16);
         printf("     ");
         goto xxx;
         break;
     }
-    return 0;
 }
-void delete(Information x)
+void delete()
 {
-   system("cls");
+    Information in[4];
+    system("cls");
     rect(40, 80, 12, 19);
-    gotoxy(45,14) ; 
+    gotoxy(45, 14);
     printf("Are you sure you want to delete");
-        gotoxy(55,15) ;
+    gotoxy(55, 15);
     printf("this user?");
     rect(42, 47, 16, 18);
-     rect(74, 78, 16, 18);
-       gotoxy(43,17) ;
-          printf("Yes");
-             gotoxy(75,17) ;
-              printf("No");
-                int choose_option;
-                xxx:
-                 fflush(stdin);
+    rect(74, 78, 16, 18);
+    gotoxy(43, 17);
+    printf("Yes");
+    gotoxy(75, 17);
+    printf("No");
+    int choose_option;
+xxx:
+    fflush(stdin);
     gotoxy(50, 20);
     printf("Choose Option");
     gotoxy(64, 20);
@@ -411,30 +489,47 @@ void delete(Information x)
     switch (choose_option)
     {
     case 1:
-     Information in[4];
-   
-    info = fopen("authentication.txt", "rb");
-    for (int i = 0; i < nusers; i++)
-    {
-      fread(&in[i], sizeof(Information), 1, info);  
-    }
-    strcpy(in[4].username,"");
-     strcpy(in[4].password,"");
-    
-      
-for (int i = userno; i < 4; i++)
-{
-   strcpy(in[i].password,in[i +1].password);
-    strcpy(in[i].username,in[i +1].username);
-}
 
-  fclose(info);
+        info = fopen("authentication.txt", "rb");
+        for (int i = 0; i < nusers; i++)
+        {
+            fread(&in[i], sizeof(Information), 1, info);
+        }
 
+        for (int i = userno; i < nusers; i++)
+        {
+            if (i == nusers - 1)
+            {
+                strcpy(in[nusers - 1].password, "");
+                strcpy(in[nusers - 1].username, "");
+            }
+            else
+            {
+                strcpy(in[i].password, in[i + 1].password);
+                strcpy(in[i].username, in[i + 1].username);
+            }
+        }
+
+        fclose(info);
+        nusers--;
+        saveNUsers(nusers);
+        info = fopen("authentication.txt", "wb");
+        for (int i = 0; i < nusers; i++)
+        {
+            fwrite(&in[i], sizeof(Information), 1, info);
+        }
+
+        fclose(info);
+        system("cls");
+        gotoxy(55, 15);
+        printf("User Deleted..");
+        sleep(2);
+        userslog();
         break;
     case 2:
-   
+        options(in[userno]);
+
         break;
-              break;
     default:
         gotoxy(64, 20);
         printf("     ");
@@ -450,11 +545,11 @@ void change_pass()
     info = fopen("authentication.txt", "rb");
     for (int i = 0; i < nusers; i++)
     {
-      fread(&in[i], sizeof(Information), 1, info);  
+        fread(&in[i], sizeof(Information), 1, info);
     }
-  fclose(info);
-  printf("%s",in[userno].password);
-   login(in[userno]);
+    fclose(info);
+    printf("%s", in[userno].password);
+    login(in[userno], 1);
     char pass[30];
 
     system("cls");
@@ -473,14 +568,213 @@ void change_pass()
     gotoxy(53, 13);
 
     scanf(" %[^\n]", pass);
-    strcpy(in[userno].password,pass);
+    strcpy(in[userno].password, pass);
     info = fopen("authentication.txt", "wb");
-for (int  i = 0; i < nusers; i++)
-{
- fwrite(&in[i], sizeof(Information), 1, info);
+    for (int i = 0; i < nusers; i++)
+    {
+        fwrite(&in[i], sizeof(Information), 1, info);
+    }
+
+    fclose(info);
 }
 
-   
-    fclose(info);
+void select_img()
+{
+}
+void select_filter()
+{
+}
+void home()
+{
+    system("cls");
+    rect(20, 102, 4, 25); // border
+    printf("\033[1m");
+    printf("\033[4m");
+    gotoxy(21, 5);
+    printf("%s", username);
+    printf("\033[0m");
 
+    rect(28, 42, 11, 15);
+    gotoxy(29, 13);
+    printf("ADD FILTER");
+    rect(46, 60, 11, 15);
+    gotoxy(47, 13);
+    printf("DELETE IMAGE");
+     gotoxy(65, 13);
+    printf("HISTORY");
+    rect(64, 76, 11, 15);
+    gotoxy(81, 13);
+    printf("LOGOUT");
+    rect(80, 94, 11, 15);
+getch();
+}
+
+int Filter()
+{
+ home();
+    dirdis();
+    FILE *inputf = fopen(infile, "rb");
+    if (inputf == NULL)
+    {
+        fclose(inputf);
+        printf("\nCould not open input img");
+        return 0;
+    }
+    FILE *outf = fopen("out.bmp", "wb");
+    if (inputf == NULL)
+    {
+        fclose(inputf);
+        printf("\nCould not open output img");
+        return 0;
+    }
+
+    BMPHeader header;
+
+    fread(&header, sizeof(BMPHeader), 1, inputf);
+    int height = abs(header.height_px);
+    int width = header.width_px;
+
+    fwrite(&header, sizeof(BMPHeader), 1, outf);
+    pixel(*image)[width] = calloc(height, width * sizeof(pixel)); // image ko 2d array bancha ra calloc use garera memory allocate gareko.
+    if (image == NULL)
+    {
+        printf("Not enough memory to store image.\n");
+        fclose(outf);
+        fclose(inputf);
+        return 7;
+    }
+    int padding = (4 - (width * sizeof(pixel)) % 4) % 4;
+
+    // input file bata data read garera array ma store gareko
+    for (int i = 0; i < height; i++)
+    {
+
+        fread(image[i], sizeof(pixel), width, inputf);
+    }
+
+    // grayscale apply
+    grayscale(height, width, image);
+
+    // write data to output file
+    for (int i = 0; i < height; i++)
+    {
+        fwrite(image[i], sizeof(pixel), width, outf);
+        for (int j = 0; j < padding; j++)
+        {
+            fputc(0x00, outf);
+        }
+    }
+
+    free(image);
+    fclose(inputf);
+    fclose(outf);
+    getch();
+    return 0;
+}
+
+int dirdis()
+{
+    char *deskpath = {"C:\\Users\\Niraj adh\\desktop"};
+    char *picpath = {"C:\\Users\\Niraj adh\\Pictures"};
+    char *downpath = {"C:\\Users\\Niraj adh\\Downloads"};
+    char openpath[200];
+
+    printf("Select Images");
+    listf(deskpath);
+    listf(picpath);
+    listf(downpath);
+
+    char image[100];
+
+    printf("SEARCH IMAGE : ");
+    fgets(image, sizeof(image), stdin);
+    image[strcspn(image, "\n")] = '\0';
+
+    strcpy(openpath, picpath);
+    strcat(openpath, "\\");
+    strcat(openpath, image);
+    int ch = searchimg(openpath);
+    if (ch == 1)
+    {
+        strcpy(openpath, deskpath);
+        strcat(openpath, "\\");
+        strcat(openpath, image);
+        ch = searchimg(openpath);
+        if (ch == 1)
+        {
+            strcpy(openpath, downpath);
+            strcat(openpath, "\\");
+            strcat(openpath, image);
+            ch = searchimg(openpath);
+            if (ch == 1)
+            {
+                printf("Failed to open the file.\n");
+
+                return 1;
+            }
+        }
+    }
+    strcpy(infile, openpath);
+    return 0;
+}
+
+int searchimg(char *openpath)
+{
+
+    FILE *file;
+    file = fopen(openpath, "r");
+
+    if (file == NULL)
+    {
+        return 1;
+    }
+
+    else
+    {
+        puts(openpath);
+        // File opened successfully, you can perform further operations on it here.
+        printf("File opened successfully!\n");
+        // Close the file
+        fclose(file);
+        return 0;
+    }
+}
+
+void listf(char *path)
+{
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(path);
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+            char *ext = strrchr(dir->d_name, '.');
+            if (ext != NULL && strcmp(ext, ".bmp") == 0)
+            {
+                printf("%s\n", dir->d_name);
+            }
+        }
+        closedir(d);
+        return;
+    }
+}
+
+// filter functions
+void grayscale(int height, int width, pixel image[height][width])
+{
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            float blue = image[i][j].rgbtBlue;
+            float green = image[i][j].rgbtGreen;
+            float red = image[i][j].rgbtRed;
+            int avg = (blue + green + red) / 3;
+
+            image[i][j].rgbtBlue = avg;
+            image[i][j].rgbtRed = avg;
+            image[i][j].rgbtGreen = avg;
+        }
+    }
 }
