@@ -6,6 +6,7 @@
 #include <windows.h>
 FILE *info;
 int userno;
+int nusers;
 FILE *userfile;
 typedef struct Info
 {
@@ -14,19 +15,18 @@ typedef struct Info
 } Information;
 void saveNUsers();
 void loadNUsers();
-int userslog();
-int login(Information x);
-int guest();
-int newuser();
-int exitprg();
+void userslog();
+void login(Information x);
+void guest();
+void newuser();
+void exitprg();
 void delete();
 void change_pass();
-int options(Information x);
+void options(Information x);
 void rect(int xa, int xb, int ya, int yb);
 void gotoxy(int x, int y);
-int first();
+void first();
 
-int nusers;
 int main()
 {
     system("color 07");
@@ -34,6 +34,7 @@ int main()
     first();
     return 0;
 }
+
 void rect(int xa, int xb, int ya, int yb)
 {
     printf("\033[1m");
@@ -73,10 +74,8 @@ void gotoxy(int x, int y)
     coord.Y = y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
-
-int first()
+void first()
 {
-
     system("cls");
     rect(20, 102, 4, 25); // border
     fflush(stdin);
@@ -158,14 +157,13 @@ int first()
         break;
     default:
         printf("wrong input");
+        sleep(1);
         system("cls");
         first();
         break;
     }
-    return 0;
 }
-
-int newuser()
+void newuser()
 {
     system("cls");
     rect(38, 90, 4, 21);
@@ -188,6 +186,7 @@ int newuser()
     if (info == NULL)
     {
         printf("Unable to open file ");
+        sleep(1);
     }
     else
     {
@@ -195,16 +194,14 @@ int newuser()
         fwrite(&i, sizeof(Information), 1, info); // writing into file in binary mode
         gotoxy(50, 17);
         printf(" Signed Up Sucessfully !!");
+        Sleep(1);
         nusers++;
         saveNUsers();
-        getch();
         fclose(info);
     }
     first();
-
-    return 0;
 }
-int userslog()
+void userslog()
 {
     int c = 9, d = 11, f = 10, choose_option = 0;
     Information in[4];
@@ -215,17 +212,20 @@ int userslog()
     gotoxy(58, 5);
     printf("USERS");
 
+    rect(21, 23, 5, 7);
+    gotoxy(22, 6);
+    printf("%c", 174);
     info = fopen("authentication.txt", "r");
-    int i = 0;
-    while (fread(&in[i], sizeof(Information), 1, info))
+
+    for (int i = 0; i < nusers; i++)
     {
+        fread(&in[i], sizeof(Information), 1, info);
         rect(49, 72, c, d);
         gotoxy(51, f);
         printf("%d. %s", i + 1, in[i].username);
         c = c + 3;
         d = d + 3;
         f = f + 3;
-        i++;
     }
 xxx:
     fflush(stdin);
@@ -236,47 +236,73 @@ xxx:
 
     switch (choose_option)
     {
+
     case 1:
-        userno = 0;
-        options(in[0]);
+        if (nusers >= 1)
+        {
+            userno = 0;
+            options(in[0]);
+            break;
+        }
 
-        break;
+        goto xxy;
     case 2:
-        userno = 1;
-        options(in[1]);
+        if (nusers >= 2)
+        {
+            userno = 1;
+            options(in[1]);
+            break;
+        }
 
-        break;
+        goto xxy;
     case 3:
-        userno = 2;
-        options(in[2]);
+        if (nusers >= 3)
+        {
+            userno = 2;
+            options(in[2]);
+            break;
+        }
+        goto xxy;
 
-        break;
     case 4:
-        userno = 3;
-        options(in[3]);
+        if (nusers == 4)
+        {
+            userno = 3;
+            options(in[3]);
+            break;
+        }
+
+        goto xxy;
+
+    case 0:
+        first();
 
         break;
     default:
+    xxy:
         gotoxy(55, 24);
         printf("wrong input");
+        Sleep(2);
+        gotoxy(55, 24);
+        printf("            ");
         gotoxy(68, 22);
         printf("     ");
         goto xxx;
         break;
     }
-    return 0;
+    first();
 }
-int guest()
+void guest()
 {
     system("cls");
     rect(38, 90, 4, 21);
     gotoxy(50, 17);
     printf(" Logged in as Guest !!");
-    return 0;
+    sleep(1);
 }
-int exitprg()
+void exitprg()
 {
-    return 0;
+    exit(0);
 }
 void saveNUsers()
 {
@@ -297,7 +323,7 @@ void loadNUsers()
         fclose(file);
     }
 }
-int login(Information x)
+void login(Information x)
 {
     char pass[30];
     system("cls");
@@ -325,31 +351,32 @@ xxx:
     {
         gotoxy(50, 15);
         printf("Logged in succesfully");
+        sleep(1);
         userfile = fopen(strcat(x.username, ".txt"), "ab");
         fclose(userfile);
         fflush(stdin);
-        getch();
     }
     else
     {
         gotoxy(51, 15);
         printf("Incorrect Password");
-        getch();
+        sleep(1);
         gotoxy(51, 15);
         printf("                  ");
         goto xxx;
     }
-
-    return 0;
 }
-int options(Information x)
+void options(Information x)
 {
     int choose_option;
     system("cls");
-    gotoxy(41, 7);
+    gotoxy(45, 7);
     printf("%s", x.username);
     rect(40, 90, 6, 18);
     rect(48, 55, 10, 13);
+    
+    gotoxy(41, 7);
+    printf("%c", 174);
     gotoxy(49, 11);
     printf("Login");
     rect(61, 69, 10, 13);
@@ -378,13 +405,15 @@ xxx:
     case 3:
         delete (x);
         break;
+    case 0:
+        userslog();
+        break;
     default:
         gotoxy(71, 16);
         printf("     ");
         goto xxx;
         break;
     }
-    return 0;
 }
 void delete()
 {
@@ -443,11 +472,11 @@ xxx:
         }
 
         fclose(info);
-          system("cls");
-          gotoxy(55, 15);
-          printf("User Deleted..");
-          getch();
-userslog();
+        system("cls");
+        gotoxy(55, 15);
+        printf("User Deleted..");
+        sleep(1);
+        userslog();
         break;
     case 2:
         options(in[userno]);
