@@ -7,7 +7,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <dirent.h>
-char infile[30];
+#include <time.h>
+char infile[100];
 #pragma pack(push, 1)
 typedef struct
 {
@@ -37,15 +38,19 @@ typedef struct
 #pragma pack(pop)
 void listf(char *path);
 int searchimg(char *openpath);
-int dirdis();
+int dirdis(int m);
 void grayscale(int height, int width, pixel image[height][width]);
+void sepia(int height, int width, pixel image[height][width]);
+void red(int height, int width, pixel image[height][width]);
+void blue(int height, int width, pixel image[height][width]);
 int Filter();
 
 FILE *info;
 int userno;
 int nusers;
-int i=10,x=31;
-int count=1;
+char img_name[30];
+int i = 9, x = 31;
+int count = 1;
 char username[30];
 FILE *userfile;
 typedef struct Info
@@ -53,6 +58,17 @@ typedef struct Info
     char username[30];
     char password[30];
 } Information;
+
+
+
+typedef struct act{
+time_t xtime;
+char inpfile[50];
+char outfile[50];
+
+} details;
+
+
 void saveNUsers();
 void loadNUsers();
 void userslog();
@@ -402,7 +418,7 @@ xxx:
         fflush(stdin);
         if (cp == 0)
         {
-           home();
+            home();
         }
     }
     else
@@ -581,7 +597,33 @@ void change_pass()
     fclose(info);
 }
 
-void select_filter(){
+void select_filter()
+{
+
+    system("cls");
+    rect(20, 102, 4, 25);
+    rect(30, 92, 7, 22);
+    printf("\033[1m");
+    printf("\033[4m");
+    gotoxy(58, 5);
+    printf("FILTERS");
+    printf("\033[0m");
+    fflush(stdin);
+
+    gotoxy(21, 5);
+    printf("%c", 174);
+    rect(32, 45, 9, 13);
+    gotoxy(34, 11);
+    printf("Grayscale");
+    rect(47, 60, 9, 13);
+    gotoxy(51, 11);
+    printf("Sepia");
+    rect(62, 75, 9, 13);
+    gotoxy(67, 11);
+    printf("red");
+    rect(77, 90, 9, 13);
+    gotoxy(81, 11);
+    printf("blue");
 }
 void home()
 {
@@ -609,9 +651,9 @@ void home()
     rect(81, 95, 11, 17);
     gotoxy(85, 14);
     printf("LOGOUT");
-   
+
 xxx:
- fflush(stdin);
+    fflush(stdin);
     gotoxy(57, 19);
     printf("Choose Option");
     gotoxy(71, 19);
@@ -620,18 +662,25 @@ xxx:
     switch (choose_option)
     {
     case 1:
-          dirdis();
-Filter();
+        dirdis(0);
+        Filter();
+        home();
         break;
     case 2:
-         dirdis();
+        dirdis(1);
+        remove(infile);
+        system("cls");
+        printf("Image Deleted.");
+        sleep(1.5);
+        home();
         break;
     case 3:
-       
+
         break;
-    case 0:
-     
+    case 4:
+first();
         break;
+
     default:
         gotoxy(71, 16);
         printf("     ");
@@ -642,14 +691,31 @@ Filter();
 
 int Filter()
 {
+
+    char out[100]={"C:\\Users\\Niraj adh\\Pictures\\"};
+    strcat(img_name,"_N.bmp");
+    strcat(out,img_name);
+    int choose_option;
+      
+    select_filter();
+    gotoxy(57, 16);
+    printf("Choose Option");
+    gotoxy(71, 16);
+    scanf("%d", &choose_option);
+if (choose_option==0)
+{
+    dirdis(0);
+    return 0;
+}
     FILE *inputf = fopen(infile, "rb");
+
     if (inputf == NULL)
     {
         fclose(inputf);
         printf("\nCould not open input img");
         return 0;
     }
-    FILE *outf = fopen("out.bmp", "wb");
+    FILE *outf = fopen(out, "wb");
     if (inputf == NULL)
     {
         fclose(inputf);
@@ -681,8 +747,45 @@ int Filter()
         fread(image[i], sizeof(pixel), width, inputf);
     }
 
-    // grayscale apply
-    grayscale(height, width, image);
+int xx=0;
+xxx:
+if(xx==1){
+      gotoxy(71, 16);
+         printf("   ");
+    fflush(stdin);
+  gotoxy(57, 16);
+    printf("Choose Option");
+    gotoxy(71, 16);
+    scanf("%d", &choose_option);
+    
+
+}
+    switch (choose_option)
+    {
+    case 1:
+    
+        grayscale(height, width, image);
+        break;
+    case 2:
+     
+        sepia(height, width, image);
+        break;
+    case 3:
+     
+        red(height, width, image);
+        break;
+    case 4:
+     
+        blue(height, width, image);
+        break;
+   
+    default:
+        gotoxy(71, 16);
+        printf("     ");
+        xx=1;
+        goto xxx;
+        break;
+    }
 
     // write data to output file
     for (int i = 0; i < height; i++)
@@ -693,15 +796,27 @@ int Filter()
             fputc(0x00, outf);
         }
     }
+    system("cls");
+    gotoxy(51, 11);
+    printf("Filter Applied");
 
     free(image);
     fclose(inputf);
     fclose(outf);
-    getch();
+
+    char a[50] = {"\""};
+    char b[50] = {"rere"};
+    strcpy(b, a);
+    strcat(b, out);
+    strcat(b, a);
+    system(b);
+
+    sleep(5);
+    home();
     return 0;
 }
 
-int dirdis()
+int dirdis(int m)
 {
     char *deskpath = {"C:\\Users\\Niraj adh\\desktop"};
     char *picpath = {"C:\\Users\\Niraj adh\\Pictures"};
@@ -715,18 +830,21 @@ int dirdis()
     gotoxy(58, 5);
     printf("Images");
     printf("\033[0m");
-       fflush(stdin);
+    fflush(stdin);
     listf(deskpath);
     listf(picpath);
     listf(downpath);
-
+    i = 9;
+    x = 31;
+    count = 1;
     char image[100];
-gotoxy(43,20);
+    gotoxy(43, 20);
     printf("SEARCH IMAGE :");
-    gotoxy(58,20);
+    gotoxy(58, 20);
     fgets(image, sizeof(image), stdin);
     image[strcspn(image, "\n")] = '\0';
-
+strcpy(img_name, image);
+   img_name[strcspn(img_name, ".")] = '\0';
     strcpy(openpath, picpath);
     strcat(openpath, "\\");
     strcat(openpath, image);
@@ -746,12 +864,22 @@ gotoxy(43,20);
             if (ch == 1)
             {
                 printf("Failed to open the file.\n");
-
+                sleep(1);
+                dirdis(0);
                 return 1;
             }
         }
     }
+
     strcpy(infile, openpath);
+    if (m==0){
+    char a[50] = {"\""};
+    char b[50] = {"rere"};
+    strcpy(b, a);
+    strcat(b, openpath);
+    strcat(b, a);
+    system(b);
+    }
     return 0;
 }
 
@@ -779,7 +907,7 @@ int searchimg(char *openpath)
 
 void listf(char *path)
 {
-   
+
     DIR *d;
     struct dirent *dir;
     d = opendir(path);
@@ -790,17 +918,16 @@ void listf(char *path)
             char *ext = strrchr(dir->d_name, '.');
             if (ext != NULL && strcmp(ext, ".bmp") == 0)
             {
-                if (i>=18)
+                if (i >= 19)
                 {
-                   i=10;
-                   x=50; 
+                    i = 9;
+                    x = 50;
                 }
-                
-                    gotoxy(x, i);
-                printf("%d.%s\n",count, dir->d_name);
-                i=i+2;
+
+                gotoxy(x, i);
+                printf("%d.%s\n", count, dir->d_name);
+                i = i + 2;
                 count++;
-               
             }
         }
         closedir(d);
@@ -825,4 +952,13 @@ void grayscale(int height, int width, pixel image[height][width])
             image[i][j].rgbtGreen = avg;
         }
     }
+}
+void sepia(int height, int width, pixel image[height][width])
+{
+}
+void red(int height, int width, pixel image[height][width])
+{
+}
+void blue(int height, int width, pixel image[height][width])
+{
 }
