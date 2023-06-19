@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <conio.h>
 #include <string.h>
-#include <unistd.h>
+#include <unistd.h>//sleep
 #include <windows.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <dirent.h>
 #include <time.h>
 char infile[100];
+char password[24];
 #pragma pack(push, 1)
 typedef struct
 {
@@ -85,10 +86,10 @@ void first();
 void select_img();
 void select_filter();
 void home();
-
+void pass();
 int main()
 {
-    system("color 07");
+ 
     loadNUsers();
     first();
     return 0;
@@ -96,6 +97,7 @@ int main()
 
 void rect(int xa, int xb, int ya, int yb)
 {
+    
     printf("\033[1m");
     int i = 0;
     for (i = xa; i < xb; i++)
@@ -135,7 +137,9 @@ void gotoxy(int x, int y)
 }
 void first()
 {
+
     system("cls");
+  
     rect(20, 102, 4, 25); // border
     fflush(stdin);
     int choose_option = 0;
@@ -170,11 +174,12 @@ void first()
         gotoxy(50, 17);
         printf("3.  GUEST USER\n");
         rect(49, 70, 19, 21);
+        
         gotoxy(50, 20);
         printf(" \t Exit");
 
-        gotoxy(50, 23);
-        printf("    Choose Option");
+        gotoxy(53, 23);
+        printf("Choose Option");
         scanf("%d", &choose_option);
     }
 
@@ -215,7 +220,10 @@ void first()
 
         break;
     default:
+    gotoxy(54, 24);
         printf("wrong input");
+         gotoxy(66, 23);
+        printf("     ");
         sleep(2);
         system("cls");
         first();
@@ -241,11 +249,12 @@ void newuser()
     gotoxy(50, 12);
     printf("Password :");
 
-    scanf(" %[^\n]", i.password);
+ pass();
+ strcpy(i.password,password);
     if (info == NULL)
     {
         printf("Unable to open file ");
-        sleep(2);
+        sleep(1);
     }
     else
     {
@@ -253,7 +262,7 @@ void newuser()
         fwrite(&i, sizeof(Information), 1, info); // writing into file in binary mode
         gotoxy(50, 17);
         printf(" Signed Up Sucessfully !!");
-        Sleep(2);
+        sleep(1);
         nusers++;
         saveNUsers();
         fclose(info);
@@ -342,7 +351,7 @@ xxx:
     xxy:
         gotoxy(55, 24);
         printf("wrong input");
-        Sleep(2);
+        sleep(2);
         gotoxy(55, 24);
         printf("            ");
         gotoxy(68, 22);
@@ -385,7 +394,7 @@ void loadNUsers()
 }
 void login(Information x, int cp)
 {
-    char pass[30];
+   
     system("cls");
     rect(20, 102, 4, 25);
     gotoxy(58, 6);
@@ -397,21 +406,20 @@ void login(Information x, int cp)
     rect(49, 72, 12, 14);
     gotoxy(53, 13);
     printf("Enter Password");
-    getch();
+    Sleep(1200);
 xxx:
     fflush(stdin);
-    /////////////////////////
+    
     gotoxy(53, 13);
     printf("              ");
     gotoxy(53, 13);
+   pass();
 
-    scanf("%[^\n]", pass);
-
-    if (strcmp(pass, x.password) == 0)
+    if (strcmp(password, x.password) == 0)
     {
         gotoxy(50, 15);
         printf("Logged in succesfully");
-        sleep(2);
+        Sleep(1200);
 
         userfile = fopen(strcat(x.username, ".txt"), "ab");
         fclose(userfile);
@@ -542,7 +550,7 @@ xxx:
         system("cls");
         gotoxy(55, 15);
         printf("User Deleted..");
-        sleep(2);
+        Sleep(1400);
         userslog();
         break;
     case 2:
@@ -569,7 +577,7 @@ void change_pass()
     fclose(info);
     printf("%s", in[userno].password);
     login(in[userno], 1);
-    char pass[30];
+   
 
     system("cls");
     rect(44, 78, 7, 20);
@@ -579,15 +587,15 @@ void change_pass()
     rect(49, 72, 12, 14);
     gotoxy(53, 13);
     printf("New Password");
-    getch();
+   Sleep(1200);
     fflush(stdin);
     /////////////////////////
     gotoxy(53, 13);
     printf("              ");
     gotoxy(53, 13);
 
-    scanf(" %[^\n]", pass);
-    strcpy(in[userno].password, pass);
+   pass();
+    strcpy(in[userno].password, password);
     info = fopen("authentication.txt", "wb");
     for (int i = 0; i < nusers; i++)
     {
@@ -671,7 +679,7 @@ xxx:
         remove(infile);
         system("cls");
         printf("Image Deleted.");
-        sleep(1.5);
+        Sleep(1200);
         home();
         break;
     case 3:
@@ -811,7 +819,7 @@ if(xx==1){
     strcat(b, a);
     system(b);
 
-    sleep(5);
+    Sleep(1200);
     home();
     return 0;
 }
@@ -864,7 +872,7 @@ strcpy(img_name, image);
             if (ch == 1)
             {
                 printf("Failed to open the file.\n");
-                sleep(1);
+                Sleep(1200);
                 dirdis(0);
                 return 1;
             }
@@ -961,4 +969,30 @@ void red(int height, int width, pixel image[height][width])
 }
 void blue(int height, int width, pixel image[height][width])
 {
+}
+
+
+void pass() {
+
+    char ch;
+    int i = 0;
+    while ((ch = getch()) != 13) {  
+        if (ch == 8) {  
+            if (i > 0) {
+                printf("\b \b");  
+                i--;
+            }
+        }
+            else if (ch <33 || ch>127)
+            {
+                
+            }
+            
+         else if (i < 24) {
+            password[i++] = ch;
+            printf("*");
+   
+        }
+    }
+    password[i] = '\0'; 
 }
