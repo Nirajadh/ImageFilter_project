@@ -8,6 +8,11 @@
 #include <stdint.h>
 #include <dirent.h>
 #include <time.h>
+typedef struct 
+{
+char image_name[30];
+}images;
+images im[15];
 char infile[100];
 char password[24];
 #pragma pack(push, 1)
@@ -66,7 +71,7 @@ typedef struct
     char inpfile[30];
     char outfile[30];
     char Filter[30];
- char date[30];
+    char date[30];
 
 } details;
 
@@ -90,7 +95,7 @@ void pass();
 void cursor(int x);
 void history();
 int check(char uname[30]);
-int arrow();
+int arrow(int mode, int a, int b, int c, int d, int higc, int lowc, int pm);
 int main()
 {
 
@@ -173,8 +178,8 @@ void gotoxy(int x, int y)
 void first()
 {
     int c = 10, d = 12;
-    int hig = 1, low = 0;
-    int n=0;
+
+    int n = 0, low = 19;
     system("cls");
 
     rect(20, 102, 4, 25); // border
@@ -196,7 +201,7 @@ void first()
         rect(49, 70, 16, 18);
         gotoxy(50, 17);
         printf(" \t Exit");
-n=1;
+        n = 1;
         gotoxy(49, 20);
         // printf("    Choose Option");
         // scanf("%d", &choose_option);
@@ -213,82 +218,13 @@ n=1;
 
         gotoxy(50, 20);
         printf(" \t Exit");
-
-       
     }
-    cursor(0);
-    int ch;
-p:
-    fflush(stdin);
-    ch = getch();
 
-    if (ch == 0 || ch == 224)
+    if (n == 1)
     {
-        while (ch != 13)
-        {
-
-            printf("\033[1;31m");
-            rect(49, 70, c, d);
-            printf("\033[0m");
-            ch = getch();
-
-            switch (ch)
-            {
-            case 72: // up
-                if (hig != 1)
-                {
-                    rect(49, 70, c, d);
-                    c = c - 3;
-                    d = d - 3;
-                }
-
-                break;
-            case 80: // down
-                if (low != 1)
-                {
-                    rect(49, 70, c, d);
-                    c = c + 3;
-                    d = d + 3;
-                }
-
-                break;
-            default:
-
-                break;
-            }
-            if (c == 10 && d == 12)
-            {
-                hig = 1;
-            }
-            else
-            {
-                hig = 0;
-            }
-
-            if (c == 19 && d == 21)
-            {
-                low = 1;
-            }
-            else
-            {
-                low = 0;
-            }
-            if (n==1 && c == 16)
-            {
-             low=1;
-            }
-            
-        }
+        low = 16;
     }
-    else
-    {
-        goto p;
-    }
-    if (ch == 13)
-    {
-        cursor(1);
-    }
-    switch (c)
+    switch (arrow(0, 49, 70, c, d, 10, low, 3))
     {
     case 10:
 
@@ -325,11 +261,7 @@ p:
 
         break;
     default:
-        // gotoxy(54, 24);
-        //     printf("wrong input");
-        //      gotoxy(66, 23);
-        //     printf("     ");
-        //     sleep(2);
+        
         system("cls");
         first();
         break;
@@ -386,171 +318,94 @@ void newuser()
 }
 void userslog()
 {
-    if (nusers!=0)
+    if (nusers != 0)
     {
-    int c = 9, d = 11, f = 10;
-    Information in[4];
-    system("cls");
+        int c = 9, d = 11, f = 10;
+        Information in[4];
+        system("cls");
 
-    rect(20, 102, 4, 25);
-    rect(44, 78, 7, 23);
-    printf("\033[1m"); // bold
-    printf("\033[4m");
+        rect(20, 102, 4, 25);
+        rect(44, 78, 7, 23);
+        printf("\033[1m"); // bold
+        printf("\033[4m");
 
-    gotoxy(58, 5);
-    printf("USERS");
-    printf("\033[0m");
-    gotoxy(22, 5);
-    printf("%c", 174);
-    info = fopen("authentication.txt", "r");
+        gotoxy(58, 5);
+        printf("USERS");
+        printf("\033[0m");
+        gotoxy(22, 5);
+        printf("%c", 174);
+        info = fopen("authentication.txt", "r");
 
-    for (int i = 0; i < nusers; i++)
-    {
-        fread(&in[i], sizeof(Information), 1, info);
-        rect(49, 72, c, d);
-        gotoxy(51, f);
-        printf("%d. %s", i + 1, in[i].username);
-        c = c + 3;
-        d = d + 3;
-        f = f + 3;
-    }
-    fclose(info);
-    c = 9;
-    d = 11;
-    int hc = 6 + (nusers * 3);
-    int hd = 8 + (nusers * 3);
-    int hig = 1, low = 0;
-    cursor(0);
-    int ch;
-m:
-    fflush(stdin);
-    ch = getch();
-    if (ch == 0 || ch == 224)
-    {
-        while (ch != 13)
+        for (int i = 0; i < nusers; i++)
         {
-            if (c == 9 && d == 11)
-            {
-                hig = 1;
-            }
-            else
-            {
-                hig = 0;
-            }
-
-            if (c == hc && d == hd)
-            {
-                low = 1;
-            }
-            else
-            {
-                low = 0;
-            }
-            printf("\033[1;31m");
+            fread(&in[i], sizeof(Information), 1, info);
             rect(49, 72, c, d);
-            printf("\033[0m");
-            ch = getch();
-            if (ch == 27)
-            {
-                printf("\033[1;31m");
-                gotoxy(22, 5);
-                printf("%c", 174);
-                printf("\033[0m");
-                Sleep(1000);
-                first();
-            }
-            switch (ch)
-            {
-            case 72: // up
-                if (hig != 1)
-                {
-                    rect(49, 72, c, d);
-                    c = c - 3;
-                    d = d - 3;
-                }
-
-                break;
-            case 80: // down
-                if (low != 1)
-                {
-                    rect(49, 72, c, d);
-                    c = c + 3;
-                    d = d + 3;
-                }
-
-                break;
-            default:
-
-                break;
-            }
+            gotoxy(51, f);
+            printf("%d. %s", i + 1, in[i].username);
+            c = c + 3;
+            d = d + 3;
+            f = f + 3;
         }
-    }
-    else if (ch == 27)
-    {
-        printf("\033[1;31m");
+        fclose(info);
+        c = 9;
+        d = 11;
+        int hc = 6 + (nusers * 3);
+
+        switch (arrow(0, 49, 72, c, d, 9, hc, 3))
+        {
+
+        case 9:
+            if (nusers >= 1)
+            {
+                userno = 0;
+                options(in[0]);
+                break;
+            }
+
+            goto xxy;
+        case 12:
+            if (nusers >= 2)
+            {
+                userno = 1;
+                options(in[1]);
+                break;
+            }
+
+            goto xxy;
+        case 15:
+            if (nusers >= 3)
+            {
+                userno = 2;
+                options(in[2]);
+                break;
+            }
+            goto xxy;
+
+        case 18:
+            if (nusers == 4)
+            {
+                userno = 3;
+                options(in[3]);
+                break;
+            }
+
+            goto xxy;
+
+        case 0:
+           printf("\033[1;31m");
         gotoxy(22, 5);
         printf("%c", 174);
         printf("\033[0m");
         Sleep(1000);
-        first();
-    }
-    else
-    {
-        goto m;
-    }
-    if (ch == 13)
-    {
-        cursor(1);
-    }
-    switch (c)
-    {
+     
+            first();
 
-    case 9:
-        if (nusers >= 1)
-        {
-            userno = 0;
-            options(in[0]);
+            break;
+        default:
+
+        xxy:
             break;
         }
-
-        goto xxy;
-    case 12:
-        if (nusers >= 2)
-        {
-            userno = 1;
-            options(in[1]);
-            break;
-        }
-
-        goto xxy;
-    case 15:
-        if (nusers >= 3)
-        {
-            userno = 2;
-            options(in[2]);
-            break;
-        }
-        goto xxy;
-
-    case 18:
-        if (nusers == 4)
-        {
-            userno = 3;
-            options(in[3]);
-            break;
-        }
-
-        goto xxy;
-
-    case 0:
-        first();
-
-        break;
-    default:
-
-    xxy:
-        break;
-    }
     }
     first();
 }
@@ -660,92 +515,7 @@ void options(Information x)
 
     int c = 47;
     int d = 55;
-    int hig = 1, low = 0;
-    cursor(0);
-    int ch;
-m:
-    fflush(stdin);
-    ch = getch();
-    if (ch == 0 || ch == 224)
-    {
-        while (ch != 13)
-        {
-            if (c == 47 && d == 55)
-            {
-                hig = 1;
-            }
-            else
-            {
-                hig = 0;
-            }
-
-            if (c == 75 && d == 83)
-            {
-                low = 1;
-            }
-            else
-            {
-                low = 0;
-            }
-            if (ch == 27)
-            {
-                printf("\033[1;31m");
-                gotoxy(41, 7);
-                printf("%c", 174);
-                printf("\033[0m");
-                Sleep(1000);
-                userslog();
-            }
-            printf("\033[1;31m");
-            rect(c, d, 10, 13);
-            printf("\033[0m");
-            ch = getch();
-
-            switch (ch)
-            {
-            case 75: // left
-                if (hig != 1)
-                {
-                    rect(c, d, 10, 13);
-                    c = c - 14;
-                    d = d - 14;
-                }
-
-                break;
-            case 77: // right
-                if (low != 1)
-                {
-                    rect(c, d, 10, 13);
-                    c = c + 14;
-                    d = d + 14;
-                }
-
-                break;
-            default:
-
-                break;
-            }
-        }
-    }
-    else if (ch == 27)
-    {
-        printf("\033[1;31m");
-        gotoxy(41, 7);
-        printf("%c", 174);
-        printf("\033[0m");
-        Sleep(1000);
-        userslog();
-    }
-
-    else
-    {
-        goto m;
-    }
-    if (ch == 13)
-    {
-        cursor(1);
-    }
-    switch (c)
+    switch (arrow(1, c, d, 10, 13, 47, 75, 14))
     {
     case 47:
         login(x, 0);
@@ -757,6 +527,11 @@ m:
         delete (x);
         break;
     case 0:
+       printf("\033[1;31m");
+        gotoxy(41, 7);
+        printf("%c", 174);
+        printf("\033[0m");
+        Sleep(1000);
         userslog();
         break;
     }
@@ -771,22 +546,14 @@ void delete()
     gotoxy(55, 15);
     printf("this user?");
     rect(42, 47, 16, 18);
-    rect(74, 78, 16, 18);
+    rect(73, 78, 16, 18);
     gotoxy(43, 17);
     printf("Yes");
     gotoxy(75, 17);
     printf("No");
-    int choose_option;
-xxx:
-    fflush(stdin);
-    gotoxy(50, 20);
-    printf("Choose Option");
-    gotoxy(64, 20);
-    scanf("%d", &choose_option);
-
-    switch (choose_option)
-    {
-    case 1:
+ switch (arrow(1, 42, 47, 16, 18, 42, 73, 31))
+{
+    case 42:
 
         info = fopen("authentication.txt", "rb");
         for (int i = 0; i < nusers; i++)
@@ -829,23 +596,17 @@ xxx:
         Sleep(1400);
         userslog();
         break;
-    case 2:
+    case 73:
         strcpy(in[userno].username, username);
         options(in[userno]);
 
         break;
-    default:
-        gotoxy(64, 20);
-        printf("     ");
-        goto xxx;
-        break;
+  
     }
 }
 void change_pass()
 {
     Information in[4];
-
-    getch();
     info = fopen("authentication.txt", "rb");
     for (int i = 0; i < nusers; i++)
     {
@@ -903,15 +664,15 @@ void select_filter()
     gotoxy(51, 11);
     printf("Sepia");
     rect(62, 75, 9, 13);
-    gotoxy(67, 11);
-    printf("red");
+    gotoxy(65, 11);
+    printf("Color++");
     rect(77, 90, 9, 13);
     gotoxy(81, 11);
     printf("blue");
 }
 void home()
 {
-
+xxx:
     system("cls");
     rect(20, 102, 4, 25); // border
     printf("\033[1m");
@@ -937,76 +698,8 @@ void home()
     printf("LOGOUT");
     int c = 27;
     int d = 41;
-    int hig = 1, low = 0;
-    cursor(0);
-    int ch;
-m:
-    fflush(stdin);
-    ch = getch();
-    if (ch == 0 || ch == 224)
-    {
-        while (ch != 13)
-        {
-            if (c == 27 && d == 41)
-            {
-                hig = 1;
-            }
-            else
-            {
-                hig = 0;
-            }
 
-            if (c == 81 && d == 95)
-            {
-                low = 1;
-            }
-            else
-            {
-                low = 0;
-            }
-
-            printf("\033[1;31m");
-            rect(c, d, 11, 17);
-            printf("\033[0m");
-            ch = getch();
-
-            switch (ch)
-            {
-            case 75: // left
-                if (hig != 1)
-                {
-                    rect(c, d, 11, 17);
-                    c = c - 18;
-                    d = d - 18;
-                }
-
-                break;
-            case 77: // right
-                if (low != 1)
-                {
-                    rect(c, d, 11, 17);
-                    c = c + 18;
-                    d = d + 18;
-                }
-
-                break;
-            default:
-
-                break;
-            }
-        }
-    }
-
-    else
-    {
-        goto m;
-    }
-    if (ch == 13)
-    {
-        cursor(1);
-    }
-
-    switch (c)
+    switch (arrow(1, c, d, 11, 17, 27, 81, 18))
     {
     case 27:
         dirdis(0);
@@ -1026,6 +719,8 @@ m:
         break;
     case 81:
         first();
+    default:
+        goto xxx;
         break;
     }
 }
@@ -1044,88 +739,15 @@ int Filter()
 
     int c = 32;
     int d = 45;
-    int hig = 1, low = 0;
-    cursor(0);
-    int ch;
-m:
-    fflush(stdin);
-    ch = getch();
-    if (ch == 0 || ch == 224)
-    {
-        while (ch != 13)
-        {
-            if (c == 32 && d == 45)
-            {
-                hig = 1;
-            }
-            else
-            {
-                hig = 0;
-            }
-
-            if (c == 77 && d == 90)
-            {
-                low = 1;
-            }
-            else
-            {
-                low = 0;
-            }
-            if (ch == 27)
-            {
-                printf("\033[1;31m");
-                gotoxy(21, 5);
-                printf("%c", 174);
-                printf("\033[0m");
-                Sleep(1000);
-                dirdis(0);
-            }
-            printf("\033[1;31m");
-            rect(c, d, 9, 13);
-            printf("\033[0m");
-            ch = getch();
-
-            switch (ch)
-            {
-            case 75: // left
-                if (hig != 1)
-                {
-                    rect(c, d, 9, 13);
-                    c = c - 15;
-                    d = d - 15;
-                }
-
-                break;
-            case 77: // right
-                if (low != 1)
-                {
-                    rect(c, d, 9, 13);
-                    c = c + 15;
-                    d = d + 15;
-                }
-
-                break;
-            }
-        }
-    }
-    else if (ch == 27)
-    {
-        printf("\033[1;31m");
+    int arr = arrow(1, c, d, 9, 13, 32, 77, 15);
+if (arr==0){
+         printf("\033[1;31m");
         gotoxy(21, 5);
         printf("%c", 174);
         printf("\033[0m");
         Sleep(1000);
         dirdis(0);
-    }
-
-    else
-    {
-        goto m;
-    }
-    if (ch == 13)
-    {
-        cursor(1);
-    }
+}
     FILE *inputf = fopen(infile, "rb");
 
     if (inputf == NULL)
@@ -1166,7 +788,7 @@ m:
         fread(image[i], sizeof(pixel), width, inputf);
     }
 
-    switch (c)
+    switch (arr)
     {
     case 32:
         strcpy(filter, "grayscale");
@@ -1184,6 +806,10 @@ m:
         strcpy(filter, "blue");
         blue(height, width, image);
         break;
+
+     
+
+
     }
 
     // write data to output file
@@ -1215,10 +841,10 @@ m:
     details de;
     time_t currentTime = time(NULL);
     struct tm *localTime = localtime(&currentTime);
-  strftime(de.date,sizeof(de.date),"%d %b, %I:%M %p",localTime);
-    strcpy(de.inpfile, strcat(inpimg,".bmp"));
-    strcpy(de.outfile,img_name);
-    strcpy(de.Filter,filter);
+    strftime(de.date, sizeof(de.date), "%d %b, %I:%M %p", localTime);
+    strcpy(de.inpfile, strcat(inpimg, ".bmp"));
+    strcpy(de.outfile, img_name);
+    strcpy(de.Filter, filter);
     fwrite(&de, sizeof(details), 1, userfile);
     fclose(userfile);
     Sleep(1200);
@@ -1248,10 +874,12 @@ int dirdis(int m)
     x = 31;
     count = 1;
     char image[100];
+    int cho;
     gotoxy(43, 20);
-    printf("SEARCH IMAGE :");
+    printf("SELECT IMAGE :");
     gotoxy(58, 20);
-    fgets(image, sizeof(image), stdin);
+   scanf("%d",&cho);
+    strcpy(image,im[cho-1].image_name);
     image[strcspn(image, "\n")] = '\0';
     strcpy(img_name, image);
     img_name[strcspn(img_name, ".")] = '\0';
@@ -1325,21 +953,25 @@ void listf(char *path)
     d = opendir(path);
     if (d)
     {
+       
         while ((dir = readdir(d)) != NULL)
         {
             char *ext = strrchr(dir->d_name, '.');
             if (ext != NULL && strcmp(ext, ".bmp") == 0)
             {
+                
                 if (i >= 19)
                 {
                     i = 9;
                     x = 50;
                 }
-
+strcpy(im[(count-1)].image_name, dir->d_name);
                 gotoxy(x, i);
+
                 printf("%d.%s\n", count, dir->d_name);
                 i = i + 2;
                 count++;
+
             }
         }
         closedir(d);
@@ -1367,12 +999,100 @@ void grayscale(int height, int width, pixel image[height][width])
 }
 void sepia(int height, int width, pixel image[height][width])
 {
+float red, blue , green;
+   for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+           blue = image[i][j].rgbtBlue;
+            green = image[i][j].rgbtGreen;
+           red = image[i][j].rgbtRed;
+           
+float sb= 0.272*red + 0.534*green + 0.131*blue;
+        float sr=  0.393*red + 0.769*green + 0.189*blue;
+        float sg= 0.349*red + 0.686*green + 0.168*blue;
+        if (sb>255)
+        {
+         image[i][j].rgbtBlue=255; 
+        }
+        else{
+            image[i][j].rgbtBlue=sb;
+        }
+         if (sr>255)
+        {
+         image[i][j].rgbtRed=255; 
+        }
+        else{
+            image[i][j].rgbtRed=sr;
+        }
+ if (sg>255)
+        {
+         image[i][j].rgbtGreen=255; 
+        }
+        else{
+            image[i][j].rgbtGreen=sg;
+        }
+        }
+    }
 }
 void red(int height, int width, pixel image[height][width])
 {
+    int blue,red,green;
+for (int i = 0; i < height; i++)
+{
+   for (int j = 0; j < width; j++)
+   {
+   blue=image[i][j].rgbtBlue;
+    red=image[i][j].rgbtRed;
+    green= image[i][j].rgbtGreen;
+    if (red<=235 && blue<235 && green<235)
+    {
+    
+    
+    if (blue>red && blue >green)
+    {
+        image[i][j].rgbtBlue=image[i][j].rgbtBlue+20;
+       
+    }
+      if (red>blue && red>green)
+    {
+        image[i][j].rgbtRed=image[i][j].rgbtRed+20;
+       
+    }
+   if (green>blue && green>red)
+    {
+        image[i][j].rgbtGreen=image[i][j].rgbtGreen+20;
+       
+    }
+    }
+   }
+   
+}
+
+
 }
 void blue(int height, int width, pixel image[height][width])
 {
+      
+
+for (int i = 0; i < height; i++)
+{
+   for (int j = 0; j < width; j++)
+   {
+   if (  image[i][j].rgbtBlue<205)
+   {
+  
+   
+   
+        image[i][j].rgbtBlue=image[i][j].rgbtBlue+50;
+   }
+   else{
+      image[i][j].rgbtBlue=255;
+   }
+   }
+   
+}
+ 
 }
 
 void pass()
@@ -1406,7 +1126,7 @@ void pass()
 void history()
 {
     system("cls");
-    rect(20, 102, 4, 25);
+   
     gotoxy(25, 5);
     printf("Input File");
     gotoxy(48, 5);
@@ -1417,31 +1137,145 @@ void history()
     printf("Date");
     char usertxt[30];
     strcpy(usertxt, username);
-    userfile = fopen(strcat(usertxt,".txt"), "rb");
+    userfile = fopen(strcat(usertxt, ".txt"), "rb");
     details n;
-
+rect(20, 102, 6, 6);
     int a = 7;
-int i=1;
-    while (fread(&n,sizeof(details),1, userfile)==1)
+    int i = 1;
+    while (fread(&n, sizeof(details), 1, userfile) == 1)
     {
 
         gotoxy(21, a);
         printf("%d.", i);
         gotoxy(25, a);
-        printf("%s",n.inpfile);
+        printf("%s", n.inpfile);
         gotoxy(48, a);
-        printf("%s",n.Filter);
+        printf("%s", n.Filter);
         gotoxy(65, a);
-        printf("%s",n.outfile);
+        printf("%s", n.outfile);
         gotoxy(85, a);
         printf("%s", n.date);
 
         a = a + 3;
         i++;
     }
+     rect(20, 102, 4, a+2);
     fclose(userfile);
     getch();
     home();
 }
 
-int arrow(int a, int b, int c, int d){
+int arrow(int mode, int a, int b, int c, int d, int higc, int lowc, int pm)
+{
+    int hig = 1;
+    int low = 0;
+    cursor(0);
+    int ch;
+p:
+    fflush(stdin);
+    ch = getch();
+
+    if (ch == 0 || ch == 224)
+    {
+
+        while (ch != 13)
+        {
+            if (ch == 27)
+            {
+
+                return 0;
+            }
+            if (c == higc || a == higc)
+            {
+                hig = 1;
+            }
+            else
+            {
+                hig = 0;
+            }
+
+            if (c == lowc || a == lowc)
+            {
+                low = 1;
+            }
+            else
+            {
+                low = 0;
+            }
+            printf("\033[1;31m");
+            rect(a, b, c, d);
+            printf("\033[0m");
+            ch = getch();
+
+            switch (ch)
+            {
+            case 72: // up
+                if (mode == 0)
+                {
+                    if (hig != 1)
+                    {
+                        rect(a, b, c, d);
+                        c = c - pm;
+                        d = d - pm;
+                    }
+                }
+                break;
+            case 80: // down
+                if (mode == 0)
+                {
+                    if (low != 1)
+                    {
+                        rect(a, b, c, d);
+                        c = c + pm;
+                        d = d + pm;
+                    }
+                }
+                break;
+            case 75: // left
+                if (mode == 1)
+                {
+                    if (hig != 1)
+                    {
+                        rect(a, b, c, d);
+                        a = a - pm;
+                        b = b - pm;
+                    }
+                }
+                break;
+            case 77: // right
+                if (mode == 1)
+                {
+                    if (low != 1)
+                    {
+                        rect(a, b, c, d);
+                        a = a + pm;
+                        b = b + pm;
+                    }
+                }
+                break;
+            default:
+
+                break;
+            }
+        }
+    }
+    else if (ch == 27)
+    {
+
+        return 0;
+    }
+    else
+    {
+        goto p;
+    }
+    if (ch == 13)
+    {
+        cursor(1);
+    }
+    if (mode == 1)
+    {
+        return a;
+    }
+
+    return c;
+}
