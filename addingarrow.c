@@ -37,6 +37,7 @@ typedef struct
     uint8_t rgbtRed;
 } pixel;
 #pragma pack(pop)
+
 void listf(char *path);
 int searchimg(char *openpath);
 int dirdis(int m);
@@ -60,11 +61,12 @@ typedef struct Info
     char password[30];
 } Information;
 
-typedef struct act
+typedef struct
 {
-    time_t xtime;
-    char inpfile[50];
-    char outfile[50];
+    char inpfile[30];
+    char outfile[30];
+    char Filter[30];
+ char date[30];
 
 } details;
 
@@ -86,6 +88,7 @@ void select_filter();
 void home();
 void pass();
 void cursor(int x);
+void history();
 int check(char uname[30]);
 int main()
 {
@@ -170,6 +173,7 @@ void first()
 {
     int c = 10, d = 12;
     int hig = 1, low = 0;
+    int n=0;
     system("cls");
 
     rect(20, 102, 4, 25); // border
@@ -191,7 +195,7 @@ void first()
         rect(49, 70, 16, 18);
         gotoxy(50, 17);
         printf(" \t Exit");
-
+n=1;
         gotoxy(49, 20);
         // printf("    Choose Option");
         // scanf("%d", &choose_option);
@@ -209,9 +213,7 @@ void first()
         gotoxy(50, 20);
         printf(" \t Exit");
 
-        // gotoxy(53, 23);
-        // printf("Choose Option");
-        // scanf("%d", &choose_option);
+       
     }
     cursor(0);
     int ch;
@@ -270,6 +272,11 @@ p:
             {
                 low = 0;
             }
+            if (n==1 && c == 16)
+            {
+             low=1;
+            }
+            
         }
     }
     else
@@ -378,6 +385,8 @@ void newuser()
 }
 void userslog()
 {
+    if (nusers!=0)
+    {
     int c = 9, d = 11, f = 10;
     Information in[4];
     system("cls");
@@ -386,11 +395,11 @@ void userslog()
     rect(44, 78, 7, 23);
     printf("\033[1m"); // bold
     printf("\033[4m");
-    
-        gotoxy(58, 5);
+
+    gotoxy(58, 5);
     printf("USERS");
     printf("\033[0m");
-        gotoxy(22, 5);
+    gotoxy(22, 5);
     printf("%c", 174);
     info = fopen("authentication.txt", "r");
 
@@ -541,15 +550,18 @@ m:
     xxy:
         break;
     }
+    }
     first();
 }
 void guest()
 {
     system("cls");
     rect(38, 90, 4, 21);
-    gotoxy(50, 17);
+    gotoxy(50, 12);
     printf(" Logged in as Guest !!");
-    sleep(2);
+    sleep(1);
+    strcpy(username, "GUEST");
+    home();
 }
 void exitprg()
 {
@@ -805,6 +817,11 @@ xxx:
         }
 
         fclose(info);
+        char deluser[50];
+        strcpy(deluser, username);
+        strcat(deluser, ".txt");
+        remove(deluser);
+
         system("cls");
         gotoxy(55, 15);
         printf("User Deleted..");
@@ -946,15 +963,7 @@ m:
             {
                 low = 0;
             }
-            if (ch == 27)
-            {
-                printf("\033[1;31m");
-                gotoxy(41, 7);
-                printf("%c", 174);
-                printf("\033[0m");
-                Sleep(1000);
-                userslog();
-            }
+
             printf("\033[1;31m");
             rect(c, d, 11, 17);
             printf("\033[0m");
@@ -986,15 +995,6 @@ m:
             }
         }
     }
-    else if (ch == 27)
-    {
-        printf("\033[1;31m");
-        gotoxy(41, 7);
-        printf("%c", 174);
-        printf("\033[0m");
-        Sleep(1000);
-        userslog();
-    }
 
     else
     {
@@ -1021,7 +1021,7 @@ m:
         home();
         break;
     case 63:
-
+        history();
         break;
     case 81:
         first();
@@ -1033,6 +1033,9 @@ int Filter()
 {
     system("cls");
     char out[100] = {"C:\\Users\\Niraj adh\\Pictures\\"};
+    char inpimg[30];
+    char filter[30];
+    strcpy(inpimg, img_name);
     strcat(img_name, "_N.bmp");
     strcat(out, img_name);
 
@@ -1165,19 +1168,19 @@ m:
     switch (c)
     {
     case 32:
-
+        strcpy(filter, "grayscale");
         grayscale(height, width, image);
         break;
     case 47:
-
+        strcpy(filter, "sepia");
         sepia(height, width, image);
         break;
     case 62:
-
+        strcpy(filter, "red");
         red(height, width, image);
         break;
     case 77:
-
+        strcpy(filter, "blue");
         blue(height, width, image);
         break;
     }
@@ -1205,7 +1208,18 @@ m:
     strcat(b, out);
     strcat(b, a);
     system(b);
-
+    char usertxt[30];
+    strcpy(usertxt, username);
+    userfile = fopen(strcat(usertxt, ".txt"), "ab");
+    details de;
+    time_t currentTime = time(NULL);
+    struct tm *localTime = localtime(&currentTime);
+  strftime(de.date,sizeof(de.date),"%d %b, %I:%M %p",localTime);
+    strcpy(de.inpfile, strcat(inpimg,".bmp"));
+    strcpy(de.outfile,img_name);
+    strcpy(de.Filter,filter);
+    fwrite(&de, sizeof(details), 1, userfile);
+    fclose(userfile);
     Sleep(1200);
     home();
     return 0;
@@ -1386,4 +1400,45 @@ void pass()
         }
     }
     password[i] = '\0';
+}
+
+void history()
+{
+    system("cls");
+    rect(20, 102, 4, 25);
+    gotoxy(25, 5);
+    printf("Input File");
+    gotoxy(48, 5);
+    printf("FILTER");
+    gotoxy(64, 5);
+    printf("Output File");
+    gotoxy(92, 5);
+    printf("Date");
+    char usertxt[30];
+    strcpy(usertxt, username);
+    userfile = fopen(strcat(usertxt,".txt"), "rb");
+    details n;
+
+    int a = 7;
+int i=1;
+    while (fread(&n,sizeof(details),1, userfile)==1)
+    {
+
+        gotoxy(21, a);
+        printf("%d.", i);
+        gotoxy(25, a);
+        printf("%s",n.inpfile);
+        gotoxy(48, a);
+        printf("%s",n.Filter);
+        gotoxy(65, a);
+        printf("%s",n.outfile);
+        gotoxy(85, a);
+        printf("%s", n.date);
+
+        a = a + 3;
+        i++;
+    }
+    fclose(userfile);
+    getch();
+    home();
 }
