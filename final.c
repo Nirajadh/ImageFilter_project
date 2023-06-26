@@ -752,6 +752,7 @@ int Filter() // filter apply garni
     strcpy(out, picpath);
     char inpimg[30];
     char filter[30];
+     strcat(out, "//");
     strcpy(inpimg, img_name);
     strcat(img_name, "_n.bmp");
     strcat(out, img_name);
@@ -952,9 +953,11 @@ int searchimg(char *openpath) // image search garni
 
     else
     {
-        puts(openpath);
-        // File opened successfully, you can perform further operations on it here.
-        printf("File opened successfully!\n");
+        //  gotoxy(43, 21);
+        // puts(openpath);
+        gotoxy(43, 23);
+        printf("File opened successfully!");
+        Sleep(1000);
         // Close the file
         fclose(file);
         return 0;
