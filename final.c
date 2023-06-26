@@ -1,17 +1,18 @@
 
 #include <stdio.h>
 #include <conio.h>
-#include <string.h>
-#include <unistd.h> //sleep
-#include <windows.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <dirent.h>
-#include <time.h>
-typedef struct 
+#include <string.h>  //string funtions
+#include <unistd.h>  //sleep
+#include <windows.h> //placement
+#include <time.h>    //time functions
+#include <stdlib.h>  //malloc,calloc
+#include <stdint.h>  //unsigned integers
+#include <dirent.h>  //directory
+typedef struct
 {
-char image_name[30];
-}images;
+    char image_name[30];
+} images;
+
 images im[15];
 char infile[100];
 char password[24];
@@ -96,15 +97,35 @@ void cursor(int x);
 void history();
 int check(char uname[30]);
 int arrow(int mode, int a, int b, int c, int d, int higc, int lowc, int pm);
-int main()
+
+char deskpath[200] = {"C:\\Users\\"};
+char picpath[200] = {"C:\\Users\\"};
+char downpath[200] = {"C:\\Users\\"};
+
+int main()           // no. of users load -- get pc ko username -- path haru -- first call
 {
 
     loadNUsers();
+
+
+    char *user_name = getenv("USERNAME");
+
+    strcat(deskpath, user_name);
+    strcat(deskpath, "\\desktop");
+
+    strcat(picpath, user_name);
+    strcat(picpath, "\\Pictures");
+
+    strcat(downpath, user_name);
+    strcat(downpath, "\\Downloads");
+
+
+
     first();
     return 0;
 }
 
-int check(char uname[30])
+int check(char uname[30]) // username already exists xa ki nai check garni
 {
     Information in[4];
     info = fopen("authentication.txt", "r");
@@ -119,7 +140,7 @@ int check(char uname[30])
     fclose(info);
     return 0;
 }
-void cursor(int x)
+void cursor(int x) // cursor show/hide garni {1== show , 0 ==hide}
 {
 
     CONSOLE_CURSOR_INFO cursorInfo;
@@ -135,7 +156,7 @@ void cursor(int x)
 
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
 }
-void rect(int xa, int xb, int ya, int yb)
+void rect(int xa, int xb, int ya, int yb) // rectangle banauni (UI)
 {
 
     printf("\033[1m");
@@ -168,14 +189,14 @@ void rect(int xa, int xb, int ya, int yb)
     }
     printf("\033[0m");
 }
-void gotoxy(int x, int y)
+void gotoxy(int x, int y) // placement
 {
     COORD coord;
     coord.X = x;
     coord.Y = y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
-void first()
+void first() // First page - { newusers, users , exit , guest }
 {
     int c = 10, d = 12;
 
@@ -185,46 +206,45 @@ void first()
     rect(20, 102, 4, 25); // border
     fflush(stdin);
     // int choose_option = 0;
-    gotoxy(54, 6);
+    gotoxy(55, 6);
     printf("\033[1m"); // bold
     printf("\033[4m"); // underline
     printf("IMAGE FILTER");
     printf("\033[0m");
-    rect(49, 70, 10, 12);
-    gotoxy(50, 11);
-    printf("1.  SELECT USER");
+    rect(50, 71, 10, 12);
+    gotoxy(55, 11);
+    printf("SELECT USER");
     if (nusers >= 4)
     {
-        rect(49, 70, 13, 15);
-        gotoxy(50, 14);
-        printf("2.  GUEST USER\n");
-        rect(49, 70, 16, 18);
-        gotoxy(50, 17);
-        printf(" \t Exit");
+        rect(50, 71, 13, 15);
+        gotoxy(55, 14);
+        printf("GUEST USER");
+        rect(50, 71, 16, 18);
+        gotoxy(58, 17);
+        printf("Exit");
         n = 1;
         gotoxy(49, 20);
-        // printf("    Choose Option");
-        // scanf("%d", &choose_option);
+      
     }
     else
     {
-        rect(49, 70, 13, 15);
-        gotoxy(50, 14);
-        printf("2.  NEW USER\n");
-        rect(49, 70, 16, 18);
-        gotoxy(50, 17);
-        printf("3.  GUEST USER\n");
-        rect(49, 70, 19, 21);
+        rect(50, 71, 13, 15);
+        gotoxy(56, 14);
+        printf("NEW USER");
+        rect(50, 71, 16, 18);
+        gotoxy(55, 17);
+        printf("GUEST USER");
+        rect(50, 71, 19, 21);
 
-        gotoxy(50, 20);
-        printf(" \t Exit");
+        gotoxy(58, 20);
+        printf("Exit");
     }
 
     if (n == 1)
     {
         low = 16;
     }
-    switch (arrow(0, 49, 70, c, d, 10, low, 3))
+    switch (arrow(0, 50, 71, c, d, 10, low, 3))
     {
     case 10:
 
@@ -261,13 +281,13 @@ void first()
 
         break;
     default:
-        
+
         system("cls");
         first();
         break;
     }
 }
-void newuser()
+void newuser() // new user create garni
 {
     system("cls");
     rect(38, 90, 4, 21);
@@ -316,7 +336,7 @@ void newuser()
     }
     first();
 }
-void userslog()
+void userslog() // user select garni
 {
     if (nusers != 0)
     {
@@ -392,12 +412,12 @@ void userslog()
             goto xxy;
 
         case 0:
-           printf("\033[1;31m");
-        gotoxy(22, 5);
-        printf("%c", 174);
-        printf("\033[0m");
-        Sleep(1000);
-     
+            printf("\033[1;31m");
+            gotoxy(22, 5);
+            printf("%c", 174);
+            printf("\033[0m");
+            Sleep(1000);
+
             first();
 
             break;
@@ -409,7 +429,7 @@ void userslog()
     }
     first();
 }
-void guest()
+void guest() // guest user
 {
     system("cls");
     rect(38, 90, 4, 21);
@@ -419,11 +439,11 @@ void guest()
     strcpy(username, "GUEST");
     home();
 }
-void exitprg()
+void exitprg() // exit program
 {
     exit(0);
 }
-void saveNUsers()
+void saveNUsers() // Number of users file ma save garni
 {
     FILE *file = fopen("nusers.txt", "w");
     if (file != NULL)
@@ -432,7 +452,7 @@ void saveNUsers()
         fclose(file);
     }
 }
-void loadNUsers()
+void loadNUsers() // program run vayesi no. of users load garni
 
 {
     FILE *file = fopen("nusers.txt", "r");
@@ -442,7 +462,7 @@ void loadNUsers()
         fclose(file);
     }
 }
-void login(Information x, int cp)
+void login(Information x, int cp) // login page
 {
 
     system("cls");
@@ -490,7 +510,7 @@ xxx:
         goto xxx;
     }
 }
-void options(Information x)
+void options(Information x) // user options {login , delete , change password}
 {
     strcpy(username, x.username);
 
@@ -527,7 +547,7 @@ void options(Information x)
         delete (x);
         break;
     case 0:
-       printf("\033[1;31m");
+        printf("\033[1;31m");
         gotoxy(41, 7);
         printf("%c", 174);
         printf("\033[0m");
@@ -536,7 +556,7 @@ void options(Information x)
         break;
     }
 }
-void delete()
+void delete() // delete user
 {
     Information in[4];
     system("cls");
@@ -551,8 +571,8 @@ void delete()
     printf("Yes");
     gotoxy(75, 17);
     printf("No");
- switch (arrow(1, 42, 47, 16, 18, 42, 73, 31))
-{
+    switch (arrow(1, 42, 47, 16, 18, 42, 73, 31))
+    {
     case 42:
 
         info = fopen("authentication.txt", "rb");
@@ -601,10 +621,9 @@ void delete()
         options(in[userno]);
 
         break;
-  
     }
 }
-void change_pass()
+void change_pass() // change password
 {
     Information in[4];
     info = fopen("authentication.txt", "rb");
@@ -642,7 +661,7 @@ void change_pass()
     fclose(info);
 }
 
-void select_filter()
+void select_filter() // filter ko ui
 {
 
     system("cls");
@@ -670,7 +689,7 @@ void select_filter()
     gotoxy(81, 11);
     printf("blue");
 }
-void home()
+void home() // login garesi home
 {
 xxx:
     system("cls");
@@ -725,14 +744,16 @@ xxx:
     }
 }
 
-int Filter()
+int Filter() // filter apply garni
 {
     system("cls");
-    char out[100] = {"C:\\Users\\Niraj adh\\Pictures\\"};
+
+    char out[100];
+    strcpy(out, picpath);
     char inpimg[30];
     char filter[30];
     strcpy(inpimg, img_name);
-    strcat(img_name, "_N.bmp");
+    strcat(img_name, "_n.bmp");
     strcat(out, img_name);
 
     select_filter();
@@ -740,14 +761,15 @@ int Filter()
     int c = 32;
     int d = 45;
     int arr = arrow(1, c, d, 9, 13, 32, 77, 15);
-if (arr==0){
-         printf("\033[1;31m");
+    if (arr == 0)
+    {
+        printf("\033[1;31m");
         gotoxy(21, 5);
         printf("%c", 174);
         printf("\033[0m");
         Sleep(1000);
         dirdis(0);
-}
+    }
     FILE *inputf = fopen(infile, "rb");
 
     if (inputf == NULL)
@@ -806,10 +828,6 @@ if (arr==0){
         strcpy(filter, "blue");
         blue(height, width, image);
         break;
-
-     
-
-
     }
 
     // write data to output file
@@ -852,11 +870,9 @@ if (arr==0){
     return 0;
 }
 
-int dirdis(int m)
+int dirdis(int m) // directory bata image select garni
 {
-    char *deskpath = {"C:\\Users\\Niraj adh\\desktop"};
-    char *picpath = {"C:\\Users\\Niraj adh\\Pictures"};
-    char *downpath = {"C:\\Users\\Niraj adh\\Downloads"};
+
     char openpath[200];
     system("cls");
     rect(20, 102, 4, 25);
@@ -878,8 +894,8 @@ int dirdis(int m)
     gotoxy(43, 20);
     printf("SELECT IMAGE :");
     gotoxy(58, 20);
-   scanf("%d",&cho);
-    strcpy(image,im[cho-1].image_name);
+    scanf("%d", &cho);
+    strcpy(image, im[cho - 1].image_name);
     image[strcspn(image, "\n")] = '\0';
     strcpy(img_name, image);
     img_name[strcspn(img_name, ".")] = '\0';
@@ -923,7 +939,7 @@ int dirdis(int m)
     return 0;
 }
 
-int searchimg(char *openpath)
+int searchimg(char *openpath) // image search garni
 {
 
     FILE *file;
@@ -945,7 +961,7 @@ int searchimg(char *openpath)
     }
 }
 
-void listf(char *path)
+void listf(char *path) // bmp image haru print garni..
 {
 
     DIR *d;
@@ -953,25 +969,24 @@ void listf(char *path)
     d = opendir(path);
     if (d)
     {
-       
+
         while ((dir = readdir(d)) != NULL)
         {
             char *ext = strrchr(dir->d_name, '.');
             if (ext != NULL && strcmp(ext, ".bmp") == 0)
             {
-                
+
                 if (i >= 19)
                 {
                     i = 9;
                     x = 50;
                 }
-strcpy(im[(count-1)].image_name, dir->d_name);
+                strcpy(im[(count - 1)].image_name, dir->d_name);
                 gotoxy(x, i);
 
                 printf("%d.%s\n", count, dir->d_name);
                 i = i + 2;
                 count++;
-
             }
         }
         closedir(d);
@@ -980,7 +995,7 @@ strcpy(im[(count-1)].image_name, dir->d_name);
 }
 
 // filter functions
-void grayscale(int height, int width, pixel image[height][width])
+void grayscale(int height, int width, pixel image[height][width]) //
 {
     for (int i = 0; i < height; i++)
     {
@@ -997,105 +1012,97 @@ void grayscale(int height, int width, pixel image[height][width])
         }
     }
 }
-void sepia(int height, int width, pixel image[height][width])
+void sepia(int height, int width, pixel image[height][width]) //
 {
-float red, blue , green;
-   for (int i = 0; i < height; i++)
+    float red, blue, green;
+    for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
-           blue = image[i][j].rgbtBlue;
+            blue = image[i][j].rgbtBlue;
             green = image[i][j].rgbtGreen;
-           red = image[i][j].rgbtRed;
-           
-float sb= 0.272*red + 0.534*green + 0.131*blue;
-        float sr=  0.393*red + 0.769*green + 0.189*blue;
-        float sg= 0.349*red + 0.686*green + 0.168*blue;
-        if (sb>255)
+            red = image[i][j].rgbtRed;
+
+            float sb = 0.272 * red + 0.534 * green + 0.131 * blue;
+            float sr = 0.393 * red + 0.769 * green + 0.189 * blue;
+            float sg = 0.349 * red + 0.686 * green + 0.168 * blue;
+            if (sb > 255)
+            {
+                image[i][j].rgbtBlue = 255;
+            }
+            else
+            {
+                image[i][j].rgbtBlue = sb;
+            }
+            if (sr > 255)
+            {
+                image[i][j].rgbtRed = 255;
+            }
+            else
+            {
+                image[i][j].rgbtRed = sr;
+            }
+            if (sg > 255)
+            {
+                image[i][j].rgbtGreen = 255;
+            }
+            else
+            {
+                image[i][j].rgbtGreen = sg;
+            }
+        }
+    }
+}
+void red(int height, int width, pixel image[height][width]) //
+{
+    int blue, red, green;
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
         {
-         image[i][j].rgbtBlue=255; 
+            blue = image[i][j].rgbtBlue;
+            red = image[i][j].rgbtRed;
+            green = image[i][j].rgbtGreen;
+            if (red <= 235 && blue < 235 && green < 235)
+            {
+
+                if (blue > red && blue > green)
+                {
+                    image[i][j].rgbtBlue = image[i][j].rgbtBlue + 20;
+                }
+                if (red > blue && red > green)
+                {
+                    image[i][j].rgbtRed = image[i][j].rgbtRed + 20;
+                }
+                if (green > blue && green > red)
+                {
+                    image[i][j].rgbtGreen = image[i][j].rgbtGreen + 20;
+                }
+            }
         }
-        else{
-            image[i][j].rgbtBlue=sb;
-        }
-         if (sr>255)
+    }
+}
+void blue(int height, int width, pixel image[height][width]) //
+{
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
         {
-         image[i][j].rgbtRed=255; 
-        }
-        else{
-            image[i][j].rgbtRed=sr;
-        }
- if (sg>255)
-        {
-         image[i][j].rgbtGreen=255; 
-        }
-        else{
-            image[i][j].rgbtGreen=sg;
-        }
+            if (image[i][j].rgbtBlue < 205)
+            {
+
+                image[i][j].rgbtBlue = image[i][j].rgbtBlue + 50;
+            }
+            else
+            {
+                image[i][j].rgbtBlue = 255;
+            }
         }
     }
-}
-void red(int height, int width, pixel image[height][width])
-{
-    int blue,red,green;
-for (int i = 0; i < height; i++)
-{
-   for (int j = 0; j < width; j++)
-   {
-   blue=image[i][j].rgbtBlue;
-    red=image[i][j].rgbtRed;
-    green= image[i][j].rgbtGreen;
-    if (red<=235 && blue<235 && green<235)
-    {
-    
-    
-    if (blue>red && blue >green)
-    {
-        image[i][j].rgbtBlue=image[i][j].rgbtBlue+20;
-       
-    }
-      if (red>blue && red>green)
-    {
-        image[i][j].rgbtRed=image[i][j].rgbtRed+20;
-       
-    }
-   if (green>blue && green>red)
-    {
-        image[i][j].rgbtGreen=image[i][j].rgbtGreen+20;
-       
-    }
-    }
-   }
-   
 }
 
-
-}
-void blue(int height, int width, pixel image[height][width])
-{
-      
-
-for (int i = 0; i < height; i++)
-{
-   for (int j = 0; j < width; j++)
-   {
-   if (  image[i][j].rgbtBlue<205)
-   {
-  
-   
-   
-        image[i][j].rgbtBlue=image[i][j].rgbtBlue+50;
-   }
-   else{
-      image[i][j].rgbtBlue=255;
-   }
-   }
-   
-}
- 
-}
-
-void pass()
+void pass() // password hidden mode ma lini
 {
 
     char ch;
@@ -1123,10 +1130,10 @@ void pass()
     password[i] = '\0';
 }
 
-void history()
+void history() // history display garni
 {
     system("cls");
-   
+
     gotoxy(25, 5);
     printf("Input File");
     gotoxy(48, 5);
@@ -1139,7 +1146,7 @@ void history()
     strcpy(usertxt, username);
     userfile = fopen(strcat(usertxt, ".txt"), "rb");
     details n;
-rect(20, 102, 6, 6);
+    rect(20, 102, 6, 6);
     int a = 7;
     int i = 1;
     while (fread(&n, sizeof(details), 1, userfile) == 1)
@@ -1159,13 +1166,13 @@ rect(20, 102, 6, 6);
         a = a + 3;
         i++;
     }
-     rect(20, 102, 4, a+2);
+    rect(20, 102, 4, a + 2);
     fclose(userfile);
     getch();
     home();
 }
 
-int arrow(int mode, int a, int b, int c, int d, int higc, int lowc, int pm)
+int arrow(int mode, int a, int b, int c, int d, int higc, int lowc, int pm) // arrow  function
 {
     int hig = 1;
     int low = 0;
