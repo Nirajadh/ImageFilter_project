@@ -38,6 +38,7 @@ int main()
 void rect(int xa, int xb, int ya, int yb)
 {
     printf("\033[1m");
+       printf("\033[30m");
     int i = 0;
     for (i = xa; i < xb; i++)
     {
