@@ -738,7 +738,7 @@ void home() // login garesi home
      char usertxt[30];
     strcpy(usertxt, username);
       char tempimgname[30];
-    strcpy(tempimgname,img_name);
+   
      details de;
 xxx:
     system("cls");
@@ -778,8 +778,10 @@ xxx:
     
    
         dirdis(1);
+         strcpy(tempimgname,img_name);
         remove(infile);
         system("cls");
+        gotoxy(50,14);
         printf("Image Deleted.");
           userfile = fopen(strcat(usertxt, ".txt"), "ab");
    
@@ -1024,7 +1026,7 @@ int dirdis(int m) // directory bata image select garni
         }
     }
 
-    printf("\n%d", chp);
+   
     strcpy(image, im[chp - 1].image_name);
     image[strcspn(image, "\n")] = '\0';
     strcpy(img_name, image);
